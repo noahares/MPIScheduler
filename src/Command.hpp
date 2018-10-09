@@ -41,7 +41,8 @@ using CommandPtr = shared_ptr<Command>;
 class CommandsContainer {
 public:
   CommandsContainer() {}
-  explicit CommandsContainer(const string &commandsFilename);
+  explicit CommandsContainer(const string &commandsFilename,
+      bool addFakeExecutableName);
 
   CommandPtr getCommand(string id) const;
   vector<CommandPtr> &getCommands() {return _commands;}

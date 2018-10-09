@@ -93,7 +93,8 @@ bool readNextLine(ifstream &is, string &os)
 
 
 
-CommandsContainer::CommandsContainer(const string &commandsFilename)
+CommandsContainer::CommandsContainer(const string &commandsFilename,
+    bool addFakeExecutableName)
 {
   ifstream reader(commandsFilename);
   if (!reader)
@@ -117,7 +118,9 @@ CommandsContainer::CommandsContainer(const string &commandsFilename)
     }
 
     vector<string> commandVector;
-    commandVector.push_back("multi-raxml");
+    if (addFakeExecutableName) {
+      commandVector.push_back("mpi-scheduler");
+    }
     while (!iss.eof()) {
       string argument;
       iss >> argument;

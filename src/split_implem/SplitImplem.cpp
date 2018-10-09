@@ -217,7 +217,7 @@ int SplitSlave::main_split_slave(int argc, char **argv)
     return 1;
   }
   _outputDir = arg.outputDir;
-  _commands = CommandsContainer(arg.commandsFilename);
+  _commands = CommandsContainer(arg.commandsFilename, true);
   _globalRank = getRank(MPI_COMM_WORLD);
   _localMasterRank = 0;
   _globalMasterRank = getSize(MPI_COMM_WORLD) - 1;

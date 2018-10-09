@@ -25,7 +25,7 @@ int OneCoreSlave::main_core_slave(int argc, char **argv)
   SchedulerArgumentsParser arg(argc, argv);
   _execPath = arg.library;
   _outputDir = arg.outputDir;
-  _commands = CommandsContainer(arg.commandsFilename);
+  _commands = CommandsContainer(arg.commandsFilename, false);
   MPI_Comm_size(MPI_COMM_WORLD, &_masterRank);
   _masterRank -= 1;
   while (true) {

@@ -92,30 +92,39 @@ bool isMPI() {
 
 int main(int argc, char *argv[])
 {
-  if (argc != 4) {
+  if (argc != 5) {
     cerr << "Invalid syntax." << endl;
-    cerr << "fake_program <trees_number> <sites_number> <openmp_threads>" << endl;
-    cerr << "when running with MPI, openmp_threads should be 1" << endl;
+    cerr << "fake_program <trees_number> <sites_number> <parallelization> <openmp_threads>" << endl;
+    cerr << "when running with mpi, openmp_threads should be 1" << endl;
     exit(0);
   }
 
+  for (int i = 0; i < argc; ++i) {
+    cout << argv[i] << " ";
+  }
+  cout  << endl;
   int trees = atoi(argv[1]);
   int sites = atoi(argv[2]);
-  int openmpThreads = atoi(argv[3]);
+  string implem = argv[3];
+  int openmpThreads = atoi(argv[4]);
   int rank = 0;
   auto start = chrono::system_clock::now();
  
-  MPI_Init(&argc,&argv);        
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   
-  if (isMPI()) {
+  if (implem == "mpi") {
+    MPI_Init(&argc,&argv);        
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     if (openmpThreads > 1) {
       cerr << "ERROR: when running with MPI, openmp_threads should be 1" << endl;
       exit(1);
     }
     fake_mpi_program(trees, sites);
-  } else {
+    MPI_Finalize();              
+  } else if(implem == "openmp") {
     fake_openmp_program(trees, sites, openmpThreads);
+  } else {
+    cerr << "invalid implem! use openmp or mpi" << endl;
+    exit(1);
   }
 
   if (rank == 0) {
@@ -124,7 +133,6 @@ int main(int argc, char *argv[])
                                    (end-start).count();
     cout << "Elapsed time " << elapsed << "ms" << endl; 
   }
-  MPI_Finalize();              
   return 0;
 }
 

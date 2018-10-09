@@ -24,7 +24,8 @@ int main_scheduler(int argc, char **argv)
     implem.startSlaves(argc, argv);
   }
   Time begin = Common::getTime();
-  CommandsContainer commands(arg.commandsFilename);
+  CommandsContainer commands(arg.commandsFilename,
+      implem.addFakeExecutableName());
   auto allocator = implem.getRanksAllocator(arg, implem.getRanksNumber());
   for (auto command: commands.getCommands()) {
     allocator->preprocessCommand(command);

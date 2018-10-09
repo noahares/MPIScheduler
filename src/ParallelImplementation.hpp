@@ -31,6 +31,7 @@ public:
   void startSlaves(int argc, char **argv);
   shared_ptr<RanksAllocator> getRanksAllocator(SchedulerArgumentsParser &arg,
                                     int ranksNumber);
+  bool addFakeExecutableName() {return _impl == split;}
 private:
   Impl _impl;
   int _rank;
