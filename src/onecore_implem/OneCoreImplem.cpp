@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <stdio.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 namespace MPIScheduler {
   
@@ -38,6 +39,8 @@ int OneCoreSlave::main_core_slave(int argc, char **argv)
       MPI_Finalize();
       break;
     }
+    // microseconds
+    usleep(10000);
   }
   return 0;
 }
