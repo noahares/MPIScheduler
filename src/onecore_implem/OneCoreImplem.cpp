@@ -32,15 +32,20 @@ int OneCoreSlave::main_core_slave(int argc, char **argv)
   while (true) {
     int signal;
     MPI_Status status;
-    MPI_Recv(&signal, 1, MPI_INT, _masterRank, TAG_MASTER_SIGNAL, MPI_COMM_WORLD, &status);
+    MPI_Request request;
+    MPI_Irecv(&signal, 1, MPI_INT, _masterRank, TAG_MASTER_SIGNAL, MPI_COMM_WORLD, &request);
+    int flag = 0;
+    while (!flag) {
+      MPI_Test(&request, &flag, &status);  
+      // microseconds
+      usleep(10000);
+    }
     if (SIGNAL_JOB == signal) {
       treatJobSlave();         
     } else if (SIGNAL_TERMINATE == signal) {
       MPI_Finalize();
       break;
     }
-    // microseconds
-    usleep(10000);
   }
   return 0;
 }
