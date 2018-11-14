@@ -1,10 +1,9 @@
 #include "SplitImplem.hpp"
 #include <mpi.h>
 #include <iostream>
-#include <dlfcn.h>
 #include <fstream>
 #include <stdio.h>
-#include "../SVGDrawer.hpp"
+#include "../DynamicLibrary.hpp"
 
 namespace MPIScheduler {
 
@@ -78,31 +77,6 @@ int mpiSplit(MPI_Comm comm, int color, int key, MPI_Comm *newcomm)
 
 SplitSlave::~SplitSlave()
 {
-  if (_handle)
-    dlclose(_handle);
-}
-
-int SplitSlave::loadLibrary(const string &libraryPath)
-{
-  _libraryPath = libraryPath;
-  if  (_handle) {
-    dlclose(_handle);
-  }
-  _handle = dlopen(libraryPath.c_str(), RTLD_LAZY);
-  if (!_handle) {
-    cerr << "Cannot open shared library " << libraryPath << endl;
-    cerr << "Error: " << dlerror() << endl;
-    return 1;
-  }
-  _raxmlMain = (mainFct) dlsym(_handle, "dll_main");
-  const char *dlsym_error = dlerror();
-  if (dlsym_error) {
-    cerr << "Cannot load symbole dll_main " << dlsym_error << endl;
-    dlclose(_handle);
-    _handle = 0;
-    return 1;
-  }
-  return 0;
 }
 
 void move_file(const string &from, const string &to)
@@ -118,36 +92,21 @@ int SplitSlave::doWork(const CommandPtr command,
     const string &outputDir) 
 {
   bool isMaster = !getRank(workersComm);
-  string logsFile = Common::joinPaths(outputDir, "running_jobs", command->getId() + "_out.txt");
-  string errFile = Common::joinPaths(outputDir, "running_jobs", command->getId() + "_err.txt");
-  loadLibrary(_libraryPath);
-  std::ofstream out(logsFile);
-  std::streambuf *coutbuf = std::cout.rdbuf(); 
-  std::cout.rdbuf(out.rdbuf()); 
-  std::ofstream err(errFile);
-  std::streambuf *cerrbuf = std::cerr.rdbuf(); 
-  std::cerr.rdbuf(err.rdbuf()); 
-  const vector<string> &args  = command->getArgs();
-  int argc = args.size(); 
-  char **argv = new char*[argc];
-  for (int i = 0; i < argc; ++i) {
-    argv[i] = (char*)args[i].c_str();
-    cout << argv[i] << " ";
-  }
-  cout << endl;
+  string logsFile = Common::joinPaths(outputDir, 
+      "running_jobs", command->getId() + "_out.txt");
+  string errFile = Common::joinPaths(outputDir, 
+      "running_jobs", command->getId() + "_err.txt");
+  auto library = DynamicLibrary::getLibrary(_libraryPath);
   MPI_Comm raxmlComm;
   Common::check(MPI_Comm_dup(workersComm, &raxmlComm));
-  int res = _raxmlMain(argc, argv, (void*)&raxmlComm);
-  std::cout.rdbuf(coutbuf);
-  std::cerr.rdbuf(cerrbuf);
-  out.close();
-  err.close();
-  delete[] argv;
+  int res = library->run(logsFile, errFile, command->getArgs(), (void*)raxmlComm);
   Common::check(MPI_Barrier(raxmlComm));
   MPI_Comm_free(&raxmlComm);
   if (isMaster) {
-    move_file(logsFile,  Common::joinPaths(outputDir, "per_job_logs", command->getId() + "_out.txt"));
-    move_file(errFile, Common::joinPaths(outputDir, "per_job_logs", command->getId() + "_err.txt"));
+    move_file(logsFile,  Common::joinPaths(outputDir, 
+          "per_job_logs", command->getId() + "_out.txt"));
+    move_file(errFile, Common::joinPaths(outputDir, 
+          "per_job_logs", command->getId() + "_err.txt"));
   }
   return res;
 }
@@ -213,9 +172,7 @@ void SplitSlave::terminateSlave()
 int SplitSlave::main_split_slave(int argc, char **argv)
 {
   SchedulerArgumentsParser arg(argc, argv);
-  if (loadLibrary(arg.library)) {
-    return 1;
-  }
+  _libraryPath = arg.library;
   _outputDir = arg.outputDir;
   _commands = CommandsContainer(arg.commandsFilename, true);
   _globalRank = getRank(MPI_COMM_WORLD);

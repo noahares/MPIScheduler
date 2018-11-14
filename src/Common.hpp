@@ -33,6 +33,7 @@ private:
 
 using Time = chrono::time_point<chrono::system_clock>;
 
+
 class Common {
 public:
   // todobenoit not portable

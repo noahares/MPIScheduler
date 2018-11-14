@@ -7,6 +7,7 @@ set(MPI_SCHEDULER_SOURCES main.cpp
   Checkpoint.cpp
   Command.cpp 
   Common.cpp 
+  DynamicLibrary.cpp 
   ParallelImplementation.cpp
   SVGDrawer.cpp
 )

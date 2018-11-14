@@ -8,7 +8,6 @@ namespace MPIScheduler {
 
 int main_split_master(int argc, char **argv);
 int main_split_slave(int argc, char **argv);
-typedef int (*mainFct)(int,char**,void*);  
 void terminate_slaves();
 
 
@@ -33,14 +32,11 @@ public:
     _localRank(-1),
     _globalRank(-1),
     _localMasterRank(-1),
-    _globalMasterRank(-1),
-    _handle(0),
-    _raxmlMain(0)
+    _globalMasterRank(-1)
   {}
   ~SplitSlave();
   int main_split_slave(int argc, char **argv);
 private:
-  int loadLibrary(const string &libraryPath);
   int doWork(const CommandPtr command, MPI_Comm workersComm, const string &outputDir); 
   void splitSlave();
   void treatJobSlave();
@@ -53,8 +49,6 @@ private:
   CommandsContainer _commands;
   string _outputDir;
   Timer _globalTimer;
-  void *_handle;
-  mainFct _raxmlMain;
   string _libraryPath;
 };
 
