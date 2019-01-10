@@ -36,7 +36,12 @@ int DynamicLibrary::run(const string &logsFile,
     cout << argv[i] << " ";
   }
   cout << endl;
-  int res = _raxmlMain(argc, argv, (void*)&comm);
+  int res = -1;
+  try {
+    res =_raxmlMain(argc, argv, (void*)&comm);
+  } catch (exception &e) {
+    cerr << "Catched exception: " << e.what() << endl;
+  }                    
   delete[] argv;
   std::cout.rdbuf(coutbuf);
   std::cerr.rdbuf(cerrbuf);
