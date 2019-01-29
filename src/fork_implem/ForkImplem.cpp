@@ -87,8 +87,8 @@ bool ForkInstance::execute(InstancePtr self)
   pid_t pid = fork();
   assert(pid >= 0);
   if (pid == 0) {
-    executeChild(_command, getOutputDir());
-    exit(0);
+    int res = executeChild(_command, getOutputDir());
+    exit(res);
   } else if (pid > 0) {
     _pid = pid; 
   }
@@ -108,7 +108,9 @@ int ForkInstance::executeChild(const CommandPtr command,
   for (auto &arg: args) {
     systemCommand = systemCommand + " " + arg;
   }
+  _timer.reset();
   int result = systemCall(systemCommand, logsFile);
+  setElapsedMs(_timer.getElapsedMs());
   remove(runningFile.c_str());
   return result;
 }
@@ -119,7 +121,7 @@ bool ForkInstance::checkFinished()
   pid_t result = waitpid(_pid, &status, WNOHANG);
   assert(result != -1);
   if (result) {
-    _returnValue = WIFEXITED(status);
+    _returnValue = WEXITSTATUS(status);
   }
   return result != 0;
 

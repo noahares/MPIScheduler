@@ -50,7 +50,7 @@ int systemCall(const string &command, const string &outputFile,
       result = pclose(ptr);
     }
     fclose(file);
-    return result;
+    return WEXITSTATUS(result);
   }
 }
 

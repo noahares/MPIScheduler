@@ -23,6 +23,7 @@ private:
   int _pid;
   int _returnValue;
   string _execPath;
+  Timer _timer;
 };
 
 class ForkRanksAllocator: public RanksAllocator {
