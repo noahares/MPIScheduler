@@ -9,11 +9,13 @@ namespace MPIScheduler {
 
 ForkRanksAllocator::ForkRanksAllocator(int availableRanks, 
     const string &execPath,
-    const string &outputDir):
+    const string &outputDir,
+    const string &threadsArg):
   _totalAvailableCores(availableRanks - 1),
   _coresInUse(0),
   _outputDir(outputDir),
-  _execPath(execPath)
+  _execPath(execPath),
+  _threadsArg(threadsArg)
 {
   Common::makedir(Common::joinPaths(outputDir, "per_job_logs"));
   Common::makedir(Common::joinPaths(outputDir, "running_jobs"));
@@ -33,12 +35,14 @@ bool ForkRanksAllocator::allRanksAvailable()
 InstancePtr ForkRanksAllocator::allocateRanks(int requestedRanks, 
       CommandPtr command)
 {
+  int ranks = min(requestedRanks, _totalAvailableCores - _coresInUse);
   shared_ptr<ForkInstance> instance(new ForkInstance(_outputDir,
     _execPath,
-    1,
-    command));
+    ranks,
+    command,
+    _threadsArg));
   _runningInstances.insert(instance);
-  _coresInUse +=1;
+  _coresInUse += ranks;
   return  instance;
 }
 
@@ -74,10 +78,12 @@ void ForkRanksAllocator::terminate()
 ForkInstance::ForkInstance(const string &outputDir, 
       const string &execPath,
       int cores, 
-      CommandPtr command):
+      CommandPtr command,
+      const string &threadsArg):
   Instance(command, 0, cores, outputDir),
   _pid(0),
-  _execPath(execPath)
+  _execPath(execPath),
+  _threadsArg(threadsArg)
 {
 
 }
@@ -109,7 +115,10 @@ int ForkInstance::executeChild(const CommandPtr command,
   for (auto &arg: args) {
     systemCommand = systemCommand + " " + arg;
   }
-  int result = systemCall(systemCommand, logsFile);
+  if (_threadsArg.size()) {
+    systemCommand += " " + _threadsArg + " " + to_string(_ranksNumber);
+  }
+  int result = systemCall(systemCommand, logsFile, true);
   remove(runningFile.c_str());
   return result;
 }

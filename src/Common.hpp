@@ -112,7 +112,7 @@ public:
   SchedulerArgumentsParser(int argc, char** argv):
     commandsFilename()
   {
-    if (argc != 6) {
+    if (argc < 6) {
       print_help();
       throw MPISchedulerException("Error: invalid syntax");
     }
@@ -122,6 +122,9 @@ public:
     commandsFilename = string(argv[i++]);
     outputDir = string(argv[i++]);
     jobFailureFatal = atoi(argv[i++]);
+    if (i < argc) {
+      threadsArg = string(argv[i++]);
+    }
   }
   
   void print_help() 
@@ -135,6 +138,7 @@ public:
   string commandsFilename;
   string outputDir;
   int jobFailureFatal;
+  string threadsArg;
 };
 
 } // namespace MPIScheduler

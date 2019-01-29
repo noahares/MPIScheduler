@@ -124,7 +124,7 @@ shared_ptr<RanksAllocator> ParallelImplementation::getRanksAllocator(SchedulerAr
   }
 #endif
   if (_impl == fork) {
-    return shared_ptr<RanksAllocator>(new ForkRanksAllocator(ranksNumber,  arg.library, arg.outputDir));
+    return shared_ptr<RanksAllocator>(new ForkRanksAllocator(ranksNumber,  arg.library, arg.outputDir, arg.threadsArg));
   }
   assert(0);
   return shared_ptr<RanksAllocator>(0);

@@ -11,7 +11,8 @@ public:
   ForkInstance(const string &outputDir, 
       const string &execPath,
       int cores, 
-      CommandPtr command);
+      CommandPtr command,
+      const string &threadsArg);
 
   virtual ~ForkInstance() {}
   virtual bool execute(InstancePtr self);
@@ -24,6 +25,7 @@ private:
   int _returnValue;
   string _execPath;
   Timer _timer;
+  string _threadsArg;
 };
 
 class ForkRanksAllocator: public RanksAllocator {
@@ -31,7 +33,8 @@ public:
   // available threads must be a power of 2
   ForkRanksAllocator(int availableRanks, 
       const string &execPath,
-      const string &outputDir);
+      const string &outputDir,
+      const string &threadsArg);
   virtual ~ForkRanksAllocator() {}
   virtual bool ranksAvailable();
   virtual bool allRanksAvailable();
@@ -46,6 +49,7 @@ private:
   int _coresInUse;
   string _outputDir;
   string _execPath;
+  string _threadsArg;
 };
 
 
