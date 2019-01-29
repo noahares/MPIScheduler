@@ -1,7 +1,6 @@
-#ifndef _MULTIRAXML_SPLIT_IMPLEM_
-#define _MULTIRAXML_SPLIT_IMPLEM_
+#pragma once
 
-#include "../Command.hpp"
+#include "../CommandsRunner.hpp"
 #include <queue>
 
 namespace MPIScheduler {
@@ -96,4 +95,3 @@ public:
 } // namespace MPIScheduler
 
 
-#endif

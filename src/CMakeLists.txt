@@ -6,9 +6,12 @@ set(CMAKE_BUILD_TYPE Debug)
 set(MPI_SCHEDULER_SOURCES main.cpp
   Checkpoint.cpp
   Command.cpp 
+  CommandsRunner.cpp 
   Common.cpp 
   DynamicLibrary.cpp 
+  Instance.cpp
   ParallelImplementation.cpp
+  RunStatistics.cpp
   SVGDrawer.cpp
 )
 set (MPI_SCHEDULER_LIBRARIES dl gcc_s gcc)

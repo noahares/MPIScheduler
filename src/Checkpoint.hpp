@@ -1,5 +1,4 @@
-#ifndef _MULTIRAXML_CHECKPOINT_HPP_
-#define _MULTIRAXML_CHECKPOINT_HPP_
+#pragma once
 
 #include <string>
 #include <fstream>
@@ -26,5 +25,4 @@ private:
 
 } // namespace MPIScheduler
 
-#endif
 

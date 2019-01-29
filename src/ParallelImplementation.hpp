@@ -1,5 +1,4 @@
-#ifndef _PARALLEL_IMPLEMENTATION_HPP_
-#define _PARALLEL_IMPLEMENTATION_HPP_
+#pragma once
 
 #include <memory>
 #include <string>
@@ -40,4 +39,3 @@ private:
 
 }
 
-#endif

@@ -2,10 +2,12 @@
 #include <iostream>
 #include <string>
 
+#include "RanksAllocator.hpp"
 #include "ParallelImplementation.hpp"
 #include "Command.hpp"
 #include "Common.hpp"
-
+#include "CommandsRunner.hpp"
+#include "RunStatistics.hpp"
 
 namespace MPIScheduler {
 

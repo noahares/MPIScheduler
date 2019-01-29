@@ -1,5 +1,4 @@
-#ifndef _SVG_DRAWER_HPP_
-#define _SVG_DRAWER_HPP_
+#pragma once
 
 #include <string>
 #include <fstream>
@@ -32,6 +31,4 @@ private:
 };
 
 } // namespace MPIScheduler
-
-#endif
 

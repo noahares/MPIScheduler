@@ -1,5 +1,4 @@
-#ifndef _MULTIRAXML_COMMON_HPP_
-#define _MULTIRAXML_COMMON_HPP_
+#pragma once
 
 #include <fstream>
 #include <chrono>
@@ -140,4 +139,3 @@ public:
 
 } // namespace MPIScheduler
 
-#endif

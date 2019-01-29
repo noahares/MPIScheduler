@@ -1,7 +1,6 @@
-#ifndef _OPENMP_IMPL_HPP_
-#define _OPENMP_IMPL_HPP_
+#pragma once
 
-#include "../Command.hpp"
+#include "../CommandsRunner.hpp"
 
 namespace MPIScheduler {
 
@@ -40,4 +39,3 @@ private:
 
 
 }
-#endif

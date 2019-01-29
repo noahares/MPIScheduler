@@ -1,7 +1,6 @@
-#ifndef ONECORE_IMPLEM_HPP
-#define ONECORE_IMPLEM_HPP
+#pragma once
 
-#include "../Command.hpp"
+#include "../CommandsRunner.hpp"
 #include <queue>
 
 
@@ -62,6 +61,4 @@ public:
 
 } // namespace MPIScheduler
 
-
-#endif
 
