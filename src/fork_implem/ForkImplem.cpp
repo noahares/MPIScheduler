@@ -52,8 +52,12 @@ vector<InstancePtr> ForkRanksAllocator::checkFinishedInstances()
   vector<InstancePtr> res;
   auto instanceIt = _runningInstances.begin();
   while (instanceIt != _runningInstances.end()) {
-    if ((*instanceIt)->checkFinished()) {
-      res.push_back(*instanceIt);
+    auto instance = *instanceIt;
+    if (instance->checkFinished()) {
+      res.push_back(instance);
+      if (instance->getReturnValue()) {
+        instance->onFailure(instance->getReturnValue());
+      }
       instanceIt = _runningInstances.erase(instanceIt);
     } else {
       instanceIt++;
@@ -114,6 +118,9 @@ bool ForkInstance::checkFinished()
   int status;
   pid_t result = waitpid(_pid, &status, WNOHANG);
   assert(result != -1);
+  if (result) {
+    _returnValue = WIFEXITED(status);
+  }
   return result != 0;
 
 }

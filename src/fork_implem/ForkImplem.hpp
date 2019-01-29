@@ -16,10 +16,12 @@ public:
   virtual ~ForkInstance() {}
   virtual bool execute(InstancePtr self);
   bool checkFinished();
+  int getReturnValue() {return _returnValue;}
 private:
   int executeChild(const CommandPtr command, 
     const string &outputDir); 
   int _pid;
+  int _returnValue;
   string _execPath;
 };
 
