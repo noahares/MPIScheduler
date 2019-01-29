@@ -10,6 +10,7 @@
 #ifdef WITH_OPENMP
 #include "openmp_implem/OpenMPImpl.hpp"
 #endif
+#include "fork_implem/ForkImplem.hpp"
 
 #include "Command.hpp"
 #include "Common.hpp"
@@ -24,6 +25,8 @@ ParallelImplementation::ParallelImplementation(const string &implem): _rank(0), 
     _impl = onecore;
   else if (implem == "--openmp-scheduler")
     _impl = openmp;
+  else if (implem == "--fork-scheduler")
+    _impl = fork;
   else
     _impl = invalid;
 }
@@ -71,7 +74,7 @@ void ParallelImplementation::initParallelContext(int argc, char **argv) {
 #endif
   } else {
     _rank = 0;
-    _ranksNumber = 0;
+    _ranksNumber = 40;
   }
 }
 
@@ -120,6 +123,9 @@ shared_ptr<RanksAllocator> ParallelImplementation::getRanksAllocator(SchedulerAr
     return shared_ptr<RanksAllocator>(new OpenMPRanksAllocator(arg.outputDir, arg.library));
   }
 #endif
+  if (_impl == fork) {
+    return shared_ptr<RanksAllocator>(new ForkRanksAllocator(ranksNumber,  arg.library, arg.outputDir));
+  }
   assert(0);
   return shared_ptr<RanksAllocator>(0);
 }

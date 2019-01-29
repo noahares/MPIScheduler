@@ -13,6 +13,7 @@ set(MPI_SCHEDULER_SOURCES main.cpp
   ParallelImplementation.cpp
   RunStatistics.cpp
   SVGDrawer.cpp
+  fork_implem/ForkImplem.cpp
 )
 set (MPI_SCHEDULER_LIBRARIES dl gcc_s gcc)
 

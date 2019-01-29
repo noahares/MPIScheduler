@@ -15,6 +15,7 @@ class ParallelImplementation {
     split,
     onecore,
     openmp,
+    fork,
     invalid
   };
 public:
