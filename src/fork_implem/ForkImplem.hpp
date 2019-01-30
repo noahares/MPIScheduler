@@ -60,7 +60,6 @@ public:
   queue<Slot> _slots;
 private:
   unordered_set<shared_ptr<ForkInstance> > _runningInstances; 
-  int _totalAvailableCores;
   int _coresInUse;
   string _outputDir;
   string _execPath;

@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iterator>
 #include <string>
+#include <unistd.h>
 
 namespace MPIScheduler {
 
@@ -111,7 +112,7 @@ CommandsRunner::CommandsRunner(const CommandsContainer &commandsContainer,
 
 }
 
-void CommandsRunner::run() 
+void CommandsRunner::run(bool isMPI) 
 {
   Timer globalTimer;
   Timer minuteTimer;
@@ -128,6 +129,9 @@ void CommandsRunner::run()
     vector<InstancePtr> finishedInstances = _allocator->checkFinishedInstances();
     for (auto instance: finishedInstances) {
       onFinishedInstance(instance);
+    }
+    if (!isMPI) {
+      usleep(50); // ms
     }
   }
 }

@@ -11,7 +11,6 @@ ForkRanksAllocator::ForkRanksAllocator(int availableRanks,
     const string &execPath,
     const string &outputDir,
     const string &threadsArg):
-  _totalAvailableCores(availableRanks - 1),
   _coresInUse(0),
   _outputDir(outputDir),
   _execPath(execPath),
@@ -19,7 +18,7 @@ ForkRanksAllocator::ForkRanksAllocator(int availableRanks,
 {
   Common::makedir(Common::joinPaths(outputDir, "per_job_logs"));
   Common::makedir(Common::joinPaths(outputDir, "running_jobs"));
-  _slots.push(Slot(0, availableRanks - 1));
+  _slots.push(Slot(0, availableRanks));
 
 }
 

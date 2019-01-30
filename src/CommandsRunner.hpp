@@ -30,7 +30,7 @@ public:
       shared_ptr<RanksAllocator> allocator,
       const string &outputDir,
       bool jobFailureFatal);
-  void run();
+  void run(bool isMPI);
   const InstancesHistoric &getHistoric() const {return _historic;} 
 private:
   

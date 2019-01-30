@@ -35,7 +35,7 @@ int main_scheduler(int argc, char **argv)
   
   // Run 
   CommandsRunner runner(commands, allocator, arg.outputDir, arg.jobFailureFatal);
-  runner.run();
+  runner.run(implem.isMPI());
   cerr << "end of run" << endl;
   // End
   Time end = Common::getTime();
