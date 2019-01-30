@@ -246,17 +246,17 @@ void SplitRanksAllocator::terminate()
   }
 }
 
-void split(const Slot &parent,
-    Slot &son1,
-    Slot &son2,
+void split(const SplitRanksAllocator::Slot &parent,
+    SplitRanksAllocator::Slot &son1,
+    SplitRanksAllocator::Slot &son2,
     int son1size)
 {
   // send signal
   int signal = SIGNAL_SPLIT;
   Common::check(mpiSend(&signal, 1, MPI_INT, parent.startingRank, TAG_MASTER_SIGNAL, MPI_COMM_WORLD));
   Common::check(mpiSend(&son1size, 1, MPI_INT, parent.startingRank, TAG_SPLIT, MPI_COMM_WORLD));
-  son1 = Slot(parent.startingRank, son1size);
-  son2 = Slot(parent.startingRank + son1size, parent.ranksNumber - son1size);
+  son1 = SplitRanksAllocator::Slot(parent.startingRank, son1size);
+  son2 = SplitRanksAllocator::Slot(parent.startingRank + son1size, parent.ranksNumber - son1size);
 }
 
 

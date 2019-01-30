@@ -3,6 +3,7 @@
 #include "../CommandsRunner.hpp"
 #include <memory>
 #include <unordered_set>
+#include <queue>
 
 namespace MPIScheduler {
 
@@ -10,6 +11,7 @@ class ForkInstance: public Instance {
 public:
   ForkInstance(const string &outputDir, 
       const string &execPath,
+      int coresOffset, 
       int cores, 
       CommandPtr command,
       const string &threadsArg);
@@ -43,6 +45,19 @@ public:
   virtual void freeRanks(InstancePtr instance);
   virtual vector<InstancePtr> checkFinishedInstances();
   virtual void terminate();
+  struct Slot {
+    Slot():
+      startingRank(0),
+      ranksNumber(0)
+    {}
+    Slot(int _startingRank, int _ranksNumber) : 
+      startingRank(_startingRank),
+      ranksNumber(_ranksNumber)
+    {}
+    int startingRank; 
+    int ranksNumber;
+  };
+  queue<Slot> _slots;
 private:
   unordered_set<shared_ptr<ForkInstance> > _runningInstances; 
   int _totalAvailableCores;

@@ -40,7 +40,7 @@ int main_scheduler(int argc, char **argv)
   } else {
     runner.run();
   }
-
+  cerr << "end of run" << endl;
   // End
   Time end = Common::getTime();
   RunStatistics statistics(runner.getHistoric(), begin, end, implem.getRanksNumber() - 1);

@@ -19,36 +19,58 @@ ForkRanksAllocator::ForkRanksAllocator(int availableRanks,
 {
   Common::makedir(Common::joinPaths(outputDir, "per_job_logs"));
   Common::makedir(Common::joinPaths(outputDir, "running_jobs"));
+  _slots.push(Slot(0, availableRanks - 1));
 
 }
 
 bool ForkRanksAllocator::ranksAvailable()
 {
-  return _coresInUse < _totalAvailableCores;
+  return !_slots.empty();
 }
 
 bool ForkRanksAllocator::allRanksAvailable()
 {
   return !_coresInUse;
 }
+
+void split(const ForkRanksAllocator::Slot &parent,
+    ForkRanksAllocator::Slot &son1,
+    ForkRanksAllocator::Slot &son2,
+    int son1size)
+{
+  son1 = ForkRanksAllocator::Slot(parent.startingRank, son1size);
+  son2 = ForkRanksAllocator::Slot(parent.startingRank + son1size, parent.ranksNumber - son1size);
+}
   
 InstancePtr ForkRanksAllocator::allocateRanks(int requestedRanks, 
       CommandPtr command)
 {
-  int ranks = min(requestedRanks, _totalAvailableCores - _coresInUse);
+  Slot slot = _slots.front();
+  _slots.pop();
+  while (slot.ranksNumber > requestedRanks) {
+    Slot slot1, slot2;
+    split(slot, slot1, slot2, slot.ranksNumber / 2); 
+    slot = slot1;
+    _slots.push(slot2);
+  }
+  
+  
   shared_ptr<ForkInstance> instance(new ForkInstance(_outputDir,
     _execPath,
-    ranks,
+    slot.startingRank,
+    slot.ranksNumber,
     command,
     _threadsArg));
   _runningInstances.insert(instance);
-  _coresInUse += ranks;
+  _coresInUse += slot.ranksNumber;
   return  instance;
 }
 
 void ForkRanksAllocator::freeRanks(InstancePtr instance) 
 {
   _coresInUse -= instance->getRanksNumber();
+  _slots.push(Slot(instance->getStartingRank(), 
+        instance->getRanksNumber()));
 }
 
 vector<InstancePtr> ForkRanksAllocator::checkFinishedInstances()
@@ -77,10 +99,11 @@ void ForkRanksAllocator::terminate()
   
 ForkInstance::ForkInstance(const string &outputDir, 
       const string &execPath,
+      int coresOffset, 
       int cores, 
       CommandPtr command,
       const string &threadsArg):
-  Instance(command, 0, cores, outputDir),
+  Instance(command, coresOffset, cores, outputDir),
   _pid(0),
   _execPath(execPath),
   _threadsArg(threadsArg)

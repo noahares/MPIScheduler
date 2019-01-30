@@ -10,19 +10,6 @@ int main_split_slave(int argc, char **argv);
 void terminate_slaves();
 
 
-struct Slot {
-  Slot():
-    startingRank(0),
-    ranksNumber(0)
-  {}
-  Slot(int _startingRank, int _ranksNumber) : 
-    startingRank(_startingRank),
-    ranksNumber(_ranksNumber)
-  {}
-
-  int startingRank; // relative to MPI_COMM_WORLD
-  int ranksNumber;
-};
 
 
 class SplitSlave {
@@ -70,6 +57,20 @@ public:
   virtual vector<InstancePtr> checkFinishedInstances();
   virtual void terminate();
   virtual void preprocessCommand(CommandPtr cmd);
+  
+  struct Slot {
+    Slot():
+      startingRank(0),
+      ranksNumber(0)
+    {}
+    Slot(int _startingRank, int _ranksNumber) : 
+      startingRank(_startingRank),
+      ranksNumber(_ranksNumber)
+    {}
+
+    int startingRank; // relative to MPI_COMM_WORLD
+    int ranksNumber;
+  };
 
 private:
   int _totalRanks;
