@@ -7,9 +7,6 @@
 #include "onecore_implem/OneCoreImplem.hpp"
 #include <mpi.h>
 #endif
-#ifdef WITH_OPENMP
-#include "openmp_implem/OpenMPImpl.hpp"
-#endif
 #include "fork_implem/ForkImplem.hpp"
 
 #include "Command.hpp"
@@ -23,8 +20,6 @@ ParallelImplementation::ParallelImplementation(const string &implem): _rank(0), 
     _impl = split;
   else if (implem == "--onecore-scheduler") 
     _impl = onecore;
-  else if (implem == "--openmp-scheduler")
-    _impl = openmp;
   else if (implem == "--fork-scheduler")
     _impl = fork;
   else
@@ -38,12 +33,6 @@ bool ParallelImplementation::isValid() const {
     return false;
   }
 #endif
-#ifndef WITH_OPENMP
-  if (isOpenMP()) { 
-    cerr << "Error: trying to use an OpenMP implementation that was not compiled" << endl;
-    return false;
-  }
-#endif
   return _impl != invalid;
 }
 
@@ -54,10 +43,6 @@ bool ParallelImplementation::isMPI() const {
   return (_impl == split) || (_impl == onecore); 
 }
 
-bool ParallelImplementation::isOpenMP() const {
-  return _impl == openmp;
-}
-
 void ParallelImplementation::initParallelContext(int argc, char **argv) {
   if (isMPI()) {
 #ifdef WITH_MPI
@@ -66,11 +51,6 @@ void ParallelImplementation::initParallelContext(int argc, char **argv) {
     MPI_Comm_size(MPI_COMM_WORLD, &_ranksNumber);
 #else
     assert(0);
-#endif
-  } else if (isOpenMP()) {
-#ifdef WITH_OPENMP
-    _rank = 0;
-    _ranksNumber = getOpenMPThreads();
 #endif
   } else {
     _rank = 0;
@@ -116,11 +96,6 @@ shared_ptr<RanksAllocator> ParallelImplementation::getRanksAllocator(SchedulerAr
   } else if (_impl == onecore) {
     return shared_ptr<RanksAllocator>(new OneCoreRanksAllocator(ranksNumber,
         arg.outputDir));
-  }
-#endif
-#ifdef WITH_OPENMP
-  if (_impl == openmp) {
-    return shared_ptr<RanksAllocator>(new OpenMPRanksAllocator(arg.outputDir, arg.library));
   }
 #endif
   if (_impl == fork) {

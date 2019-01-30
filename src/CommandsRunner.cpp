@@ -132,29 +132,6 @@ void CommandsRunner::run()
   }
 }
   
-void CommandsRunner::runOpenMP()
-{
-#pragma omp parallel for
-  for (int i = 0; i < _commandsContainer.getCommands().size(); ++i) {
-    CommandPtr command = 0;
-    InstancePtr instance = 0;
-#pragma omp critical
-    {
-      command = _commandsContainer.getCommands()[i];
-      instance = _allocator->allocateRanks(1, command); 
-    }
-    if (!instance->execute(instance)) {
-      cout << "Failed to start command " << command->getId() << endl;
-    } else {
-#pragma omp critical
-      {
-        _historic.push_back(instance);
-        onFinishedInstance(instance);
-      }
-    }
-  }
-
-}
 
 
 bool CommandsRunner::compareCommands(CommandPtr c1, CommandPtr c2)

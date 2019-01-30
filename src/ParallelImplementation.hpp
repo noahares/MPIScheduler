@@ -14,7 +14,6 @@ class ParallelImplementation {
   enum Impl {
     split,
     onecore,
-    openmp,
     fork,
     invalid
   };
@@ -24,7 +23,6 @@ public:
   int getRank() const;
   int getRanksNumber() const;
   bool isMPI() const;
-  bool isOpenMP() const;
   void initParallelContext(int argc, char **argv);
   void closeParallelContext();
   bool slavesToStart() const;

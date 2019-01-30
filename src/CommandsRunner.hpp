@@ -31,7 +31,6 @@ public:
       const string &outputDir,
       bool jobFailureFatal);
   void run();
-  void runOpenMP();
   const InstancesHistoric &getHistoric() const {return _historic;} 
 private:
   

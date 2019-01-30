@@ -35,11 +35,7 @@ int main_scheduler(int argc, char **argv)
   
   // Run 
   CommandsRunner runner(commands, allocator, arg.outputDir, arg.jobFailureFatal);
-  if (implem.isOpenMP()) {
-    runner.runOpenMP();
-  } else {
-    runner.run();
-  }
+  runner.run();
   cerr << "end of run" << endl;
   // End
   Time end = Common::getTime();
