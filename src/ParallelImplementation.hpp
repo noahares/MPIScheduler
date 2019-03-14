@@ -3,6 +3,10 @@
 #include <memory>
 #include <string>
 
+#ifdef WITH_MPI
+#include <mpi.h>
+#endif
+
 using namespace std;
 
 namespace MPIScheduler {
@@ -23,7 +27,7 @@ public:
   int getRank() const;
   int getRanksNumber() const;
   bool isMPI() const;
-  void initParallelContext(int argc, char **argv);
+  void initParallelContext(int argc, char **argv, void *comm);
   void closeParallelContext();
   bool slavesToStart() const;
   void startSlaves(int argc, char **argv);
@@ -34,6 +38,10 @@ private:
   Impl _impl;
   int _rank;
   int _ranksNumber;
+  bool _ownMPIContext;
+#ifdef WITH_MPI
+  MPI_Comm _comm;
+#endif
 };
 
 }

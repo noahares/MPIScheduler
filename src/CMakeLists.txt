@@ -28,7 +28,15 @@ if (WITH_MPI)
 endif()
 
 
-add_executable(mpi-scheduler ${MPI_SCHEDULER_SOURCES}) 
+if (MPISCHEDULER_BUILD_AS_LIBRARY)
+  add_library(mpi-scheduler MODULE ${MPI_SCHEDULER_SOURCES})
+else()
+  add_executable(mpi-scheduler ${MPI_SCHEDULER_SOURCES}) 
+endif()
+
+if (MPISCHEDULER_BUILD_AS_LIBRARY AND NOT APPLE)
+  target_link_libraries(mpi-scheduler gcc_s gcc)
+endif()
 
 target_link_libraries(mpi-scheduler ${MPI_SCHEDULER_LIBRARIES})
 

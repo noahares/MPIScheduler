@@ -12,7 +12,7 @@
 namespace MPIScheduler {
 
   
-int main_scheduler(int argc, char **argv)
+int main_scheduler(int argc, char **argv, void* comm)
 {
   // Init
   SchedulerArgumentsParser arg(argc, argv);
@@ -21,7 +21,7 @@ int main_scheduler(int argc, char **argv)
     cerr << "Invalid scheduler implementation: " << arg.implem << endl;
     return 1;
   }
-  implem.initParallelContext(argc, argv);
+  implem.initParallelContext(argc, argv, comm);
   if (implem.slavesToStart()) {
     implem.startSlaves(argc, argv);
   }
@@ -52,8 +52,21 @@ int main_scheduler(int argc, char **argv)
 
 } // namespace MPIScheduler
 
-int main(int argc, char** argv) 
+
+
+#ifdef MPISCHEDULER_BUILD_AS_LIBRARY
+
+extern "C" int mpi_scheduler_main(int argc, char** argv, void* comm)
 {
-  exit(MPIScheduler::main_scheduler(argc, argv));
+  return MPIScheduler::main_scheduler(argc, argv, comm);
 }
 
+#else
+
+int main(int argc, char** argv) 
+{
+  exit(MPIScheduler::main_scheduler(argc, argv, 0));
+}
+
+
+#endif

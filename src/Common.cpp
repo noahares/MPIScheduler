@@ -42,6 +42,7 @@ int systemCall(const string &command, const string &outputFile,
       cerr << "[MPIScheduler error] Cannot open output file " << outputFile << endl;
       return 0;
     }
+    cout << command.c_str() << endl;
     if ((ptr = popen(command.c_str(), "r")) != NULL) {
       char buf[BUFSIZ];
       while (fgets(buf, BUFSIZ, ptr) != NULL) {
