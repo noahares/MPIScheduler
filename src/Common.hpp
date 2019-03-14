@@ -116,7 +116,7 @@ public:
       print_help();
       throw MPISchedulerException("Error: invalid syntax");
     }
-    unsigned int i = 1;
+    int i = 1;
     implem = string(argv[i++]);
     library = string(argv[i++]);
     commandsFilename = string(argv[i++]);

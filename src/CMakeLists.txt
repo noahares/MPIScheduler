@@ -29,7 +29,7 @@ endif()
 
 
 if (MPISCHEDULER_BUILD_AS_LIBRARY)
-  add_library(mpi-scheduler MODULE ${MPI_SCHEDULER_SOURCES})
+  add_library(mpi-scheduler ${MPI_SCHEDULER_SOURCES})
 else()
   add_executable(mpi-scheduler ${MPI_SCHEDULER_SOURCES}) 
 endif()
