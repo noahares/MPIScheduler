@@ -24,6 +24,10 @@ int main_scheduler(int argc, char **argv, void* comm)
   implem.initParallelContext(argc, argv, comm);
   if (implem.slavesToStart()) {
     implem.startSlaves(argc, argv);
+    if (implem.getRank() != implem.getRanksNumber() - 1) {
+      implem.closeParallelContext();
+      return 0;
+    }
   }
   Time begin = Common::getTime();
   CommandsContainer commands(arg.commandsFilename,
@@ -58,7 +62,9 @@ int main_scheduler(int argc, char **argv, void* comm)
 
 extern "C" int mpi_scheduler_main(int argc, char** argv, void* comm)
 {
-  return MPIScheduler::main_scheduler(argc, argv, comm);
+  int res =  MPIScheduler::main_scheduler(argc, argv, comm);
+  MPI_Barrier(*((MPI_Comm*)comm)); 
+  return res;
 }
 
 #else

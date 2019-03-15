@@ -166,7 +166,6 @@ void SplitSlave::terminateSlave()
     int signal = SIGNAL_TERMINATE;
     Common::check(mpiBcast(&signal, 1, MPI_INT, _localMasterRank, _localComm));
   }
-  Common::check(MPI_Finalize());
 }
 
 int SplitSlave::main_split_slave(int argc, char **argv)

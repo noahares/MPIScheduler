@@ -91,7 +91,6 @@ void ParallelImplementation::startSlaves(int argc, char **argv) {
       slave.main_core_slave(argc, argv);
     }
 #endif
-    exit(0);
   }
 }
 
