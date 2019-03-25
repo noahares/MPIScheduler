@@ -29,6 +29,10 @@ int main_scheduler(int argc, char **argv, void* comm)
       return 0;
     }
   }
+  Logger masterLogger;
+  if (arg.outputLogs.size() != 0) {
+    masterLogger.redirectLogs(arg.outputLogs);
+  }
   Time begin = Common::getTime();
   CommandsContainer commands(arg.commandsFilename,
       implem.addFakeExecutableName());
@@ -38,19 +42,19 @@ int main_scheduler(int argc, char **argv, void* comm)
   }
   
   // Run 
-  CommandsRunner runner(commands, allocator, arg.outputDir, arg.jobFailureFatal);
+  CommandsRunner runner(commands, allocator, arg.outputDir, arg.jobFailureFatal, masterLogger);
   runner.run(implem.isMPI());
-  cerr << "end of run" << endl;
+  masterLogger.getCout() << "end of run" << endl;
   // End
   Time end = Common::getTime();
-  RunStatistics statistics(runner.getHistoric(), begin, end, implem.getRanksNumber() - 1);
+  RunStatistics statistics(runner.getHistoric(), begin, end, implem.getRanksNumber() - 1, masterLogger);
   statistics.printGeneralStatistics();
   if (runner.getHistoric().size()) {
     statistics.exportSVG(Common::getIncrementalLogFile(arg.outputDir, "statistics", "svg"));
   }
   allocator->terminate();
   implem.closeParallelContext();
-  cout << "End of Multiraxml run" << endl;
+  masterLogger.getCout() << "End of Multiraxml run" << endl;
   return 0;
 }
 

@@ -125,6 +125,9 @@ public:
     if (i < argc) {
       threadsArg = string(argv[i++]);
     }
+    if (i < argc) {
+      outputLogs = string(argv[i++]);
+    }
   }
   
   void print_help() 
@@ -139,6 +142,7 @@ public:
   string outputDir;
   int jobFailureFatal;
   string threadsArg;
+  string outputLogs;
 };
 
 } // namespace MPIScheduler

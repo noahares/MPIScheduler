@@ -2,18 +2,21 @@
 #include "RunStatistics.hpp"
 
 #include "SVGDrawer.hpp"
+#include "Logger.hpp"
 
 namespace MPIScheduler {
 
 RunStatistics::RunStatistics(const InstancesHistoric &historic,
     Time begin,
     Time end,
-    int availableRanks):
+    int availableRanks,
+    Logger &masterLogger):
   _historic(historic),
   _begin(begin),
   _end(end),
   _availableRanks(availableRanks),
-  _lbRatio(1.0)
+  _lbRatio(1.0),
+  _masterLogger(masterLogger)
 {
 
 }
@@ -27,18 +30,18 @@ void RunStatistics::printGeneralStatistics()
   }
   _lbRatio = double(cumulatedTime) / double(_availableRanks * totalElapsedTime);
   
-  cout << "Finished running commands. Total elasped time: ";
-  cout << totalElapsedTime / 1000  << "s" << endl;
-  cout << "Load balance ratio: " << _lbRatio << endl;
+  _masterLogger.getCout() << "Finished running commands. Total elasped time: ";
+  _masterLogger.getCout() << totalElapsedTime / 1000  << "s" << endl;
+  _masterLogger.getCout() << "Load balance ratio: " << _lbRatio << endl;
 }
 
 
 void RunStatistics::exportSVG(const string &svgfile) 
 {
   Timer t;
-  cout << "Saving svg output in " << svgfile << endl;
+  _masterLogger.getCout() << "Saving svg output in " << svgfile << endl;
   int totalWidth = _availableRanks + 1;
-  cout << "total width " << totalWidth << endl;
+  _masterLogger.getCout() << "total width " << totalWidth << endl;
   int totalHeight = Common::getElapsedMs(_begin, _end);
   string caption = "t = " + to_string(totalHeight / 1000) + "s";
   caption += ", lb = " + to_string(_lbRatio);
@@ -48,7 +51,7 @@ void RunStatistics::exportSVG(const string &svgfile)
     instance->writeSVGStatistics(svg, _begin);
   }
   svg.writeFooter();
-  cout << "Time spent writting svg: " << t.getElapsedMs() / 1000 << "s" << endl;
+  _masterLogger.getCout() << "Time spent writting svg: " << t.getElapsedMs() / 1000 << "s" << endl;
 }
 
 } // namespace MPIScheduler
