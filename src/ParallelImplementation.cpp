@@ -69,7 +69,6 @@ void ParallelImplementation::closeParallelContext() {
   if (isMPI()) {
 #ifdef WITH_MPI
     if (_ownMPIContext) {
-      cerr << getRank() << " finalize" << endl;
       MPI_Finalize();
     }
 #else
