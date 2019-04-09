@@ -43,7 +43,6 @@ int OneCoreSlave::main_core_slave(int argc, char **argv)
     if (SIGNAL_JOB == signal) {
       treatJobSlave();         
     } else if (SIGNAL_TERMINATE == signal) {
-      MPI_Finalize();
       break;
     }
   }
