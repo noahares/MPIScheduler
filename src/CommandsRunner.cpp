@@ -1,7 +1,7 @@
 #include "CommandsRunner.hpp"
 
 #include "Common.hpp"
-
+#include "Logger.hpp"
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -89,17 +89,19 @@ CommandPtr CommandsContainer::getCommand(string id) const
 CommandsRunner::CommandsRunner(const CommandsContainer &commandsContainer,
       shared_ptr<RanksAllocator> allocator,
       const string &outputDir,
-      bool jobFailureFatal):
+      bool jobFailureFatal,
+      Logger &masterLogger):
   _commandsContainer(commandsContainer),
   _outputDir(outputDir),
   _allocator(allocator),
   _checkpoint(outputDir),
   _finishedInstancesNumber(0),
   _verbose(true),
-  _jobFailureFatal(jobFailureFatal)
+  _jobFailureFatal(jobFailureFatal),
+  _masterLogger(masterLogger)
 {
   Instance::_jobFailureFatal = _jobFailureFatal;
-  cout << "The master process runs on node " << Common::getHost() 
+  _masterLogger.getCout() << "The master process runs on node " << Common::getHost() 
        << " and on pid " << Common::getPid() << endl;
   for (auto command: commandsContainer.getCommands()) {
     if (!_checkpoint.isDone(command->getId())) {
@@ -108,7 +110,7 @@ CommandsRunner::CommandsRunner(const CommandsContainer &commandsContainer,
   }
   sort(_commandsVector.begin(), _commandsVector.end(), compareCommands);
   _commandIterator = _commandsVector.begin();
-  cout << "Remaining commands: " << _commandsVector.size() << endl;
+  _masterLogger.getCout() << "Remaining commands: " << _commandsVector.size() << endl;
 
 }
 
@@ -118,7 +120,7 @@ void CommandsRunner::run(bool isMPI)
   Timer minuteTimer;
   while (!_allocator->allRanksAvailable() || !isCommandsEmpty()) {
     if (minuteTimer.getElapsedMs() > 1000 * 60) {
-      cout << "Runner is still alive after " << globalTimer.getElapsedMs() / 1000 << "s" << endl;
+      _masterLogger.getCout() << "Runner is still alive after " << globalTimer.getElapsedMs() / 1000 << "s" << endl;
       minuteTimer.reset();
     } 
     if (!isCommandsEmpty()) {
@@ -152,13 +154,13 @@ bool CommandsRunner::executePendingCommand()
   auto command = getPendingCommand();
   InstancePtr instance = _allocator->allocateRanks(command->getRanksNumber(), command);
   if (!instance->execute(instance)) {
-    cout << "Failed to start " << command->getId() << ". Will retry later " << endl;
+    _masterLogger.getCout() << "Failed to start " << command->getId() << ". Will retry later " << endl;
     _allocator->freeRanks(instance);
     return false;
   }
     
   if (_verbose) {
-    cout << "## Started " << command->getId() << " on [" 
+    _masterLogger.getCout() << "## Started " << command->getId() << " on [" 
       << instance->getStartingRank()  << ":"
       << instance->getStartingRank() + instance->getRanksNumber() - 1 
       << "] "
@@ -167,7 +169,7 @@ bool CommandsRunner::executePendingCommand()
   _historic.push_back(instance);
   ++_commandIterator;
   if (isCommandsEmpty()) {
-    cout << "All commands were launched" << endl;
+    _masterLogger.getCout() << "All commands were launched" << endl;
   }
   return true;
 }
@@ -177,8 +179,8 @@ void CommandsRunner::onFinishedInstance(InstancePtr instance)
   instance->onFinished();
   _checkpoint.markDone(instance->getId());
   if (_verbose) {
-    cout << "End of " << instance->getId() << " after " <<  instance->getElapsedMs() << "ms ";
-    cout << " (" << ++_finishedInstancesNumber << "/" << _commandsVector.size() << ")" << endl;
+    _masterLogger.getCout() << "End of " << instance->getId() << " after " <<  instance->getElapsedMs() << "ms ";
+    _masterLogger.getCout() << " (" << ++_finishedInstancesNumber << "/" << _commandsVector.size() << ")" << endl;
   }
  _allocator->freeRanks(instance);
 }

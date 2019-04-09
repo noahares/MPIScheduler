@@ -4,6 +4,10 @@
 #include <string>
 #include <vector>
 
+#ifdef MPISCHEDULER_STATIC_SCHEDULED_MAIN
+extern "C" int static_scheduled_main(int argc, char** argv, void* comm);
+#endif
+
 using namespace std;
 typedef int (*mainFct)(int,char**,void*);  
 

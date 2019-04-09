@@ -7,12 +7,15 @@
 
 namespace MPIScheduler {
 
+class Logger;
+
 class RunStatistics {
 public:
   RunStatistics(const InstancesHistoric &historic, 
       Time begin, 
       Time end,
-      int availableRanks);
+      int availableRanks,
+      Logger &masterLogger);
   void printGeneralStatistics();
   void exportSVG(const string &svgfile);
 private:
@@ -21,6 +24,7 @@ private:
   Time _end;
   int _availableRanks;
   double _lbRatio;
+  Logger &_masterLogger;
 };
 
 } // namespace MPIScheduler

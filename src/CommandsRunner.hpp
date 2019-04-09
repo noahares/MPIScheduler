@@ -3,10 +3,13 @@
 #include "Command.hpp"
 #include "Instance.hpp"
 #include "RanksAllocator.hpp"
+#include "Logger.hpp"
+
 
 namespace MPIScheduler {
 
 class SVGDrawer;
+class Logger;
 
 class CommandsContainer {
 public:
@@ -29,7 +32,8 @@ public:
   CommandsRunner(const CommandsContainer &commandsContainer,
       shared_ptr<RanksAllocator> allocator,
       const string &outputDir,
-      bool jobFailureFatal);
+      bool jobFailureFatal,
+      Logger &masterLogger);
   void run(bool isMPI);
   const InstancesHistoric &getHistoric() const {return _historic;} 
 private:
@@ -53,6 +57,7 @@ private:
   int _finishedInstancesNumber;
   bool _verbose;
   bool _jobFailureFatal;
+  Logger &_masterLogger;
 };
 
 }

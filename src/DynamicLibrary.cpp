@@ -52,6 +52,15 @@ int DynamicLibrary::run(const string &logsFile,
 
 bool DynamicLibrary::setPath(const string &libraryPath)
 {
+  if (libraryPath == "--static_scheduled_main") {
+#ifdef MPISCHEDULER_STATIC_SCHEDULED_MAIN
+    _raxmlMain = (mainFct) static_scheduled_main;
+    return true;
+#else
+    cerr << "To use static_scheduled_main, please compile with MPISCHEDULER_STATIC_SCHEDULED_MAIN cmake variable on" << endl;
+    return false;;
+#endif
+  }
   _handle = dlopen(libraryPath.c_str(), RTLD_LAZY);
   if (!_handle) {
     cerr << "Cannot open shared library " << libraryPath << endl;

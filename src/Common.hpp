@@ -119,7 +119,7 @@ public:
       print_help();
       throw MPISchedulerException("Error: invalid syntax");
     }
-    unsigned int i = 1;
+    int i = 1;
     implem = string(argv[i++]);
     library = string(argv[i++]);
     commandsFilename = string(argv[i++]);
@@ -127,6 +127,9 @@ public:
     jobFailureFatal = atoi(argv[i++]);
     if (i < argc) {
       threadsArg = string(argv[i++]);
+    }
+    if (i < argc) {
+      outputLogs = string(argv[i++]);
     }
   }
   
@@ -142,6 +145,7 @@ public:
   string outputDir;
   int jobFailureFatal;
   string threadsArg;
+  string outputLogs;
 };
 
 } // namespace MPIScheduler

@@ -12,7 +12,7 @@
 namespace MPIScheduler {
 
   
-int main_scheduler(int argc, char **argv)
+int main_scheduler(int argc, char **argv, void* comm)
 {
   // Init
   SchedulerArgumentsParser arg(argc, argv);
@@ -21,9 +21,17 @@ int main_scheduler(int argc, char **argv)
     cerr << "Invalid scheduler implementation: " << arg.implem << endl;
     return 1;
   }
-  implem.initParallelContext(argc, argv);
+  implem.initParallelContext(argc, argv, comm);
   if (implem.slavesToStart()) {
     implem.startSlaves(argc, argv);
+    if (implem.getRank() != implem.getRanksNumber() - 1) {
+      implem.closeParallelContext();
+      return 0;
+    }
+  }
+  Logger masterLogger;
+  if (arg.outputLogs.size() != 0) {
+    masterLogger.redirectLogs(arg.outputLogs);
   }
   Time begin = Common::getTime();
   CommandsContainer commands(arg.commandsFilename,
@@ -34,26 +42,41 @@ int main_scheduler(int argc, char **argv)
   }
   
   // Run 
-  CommandsRunner runner(commands, allocator, arg.outputDir, arg.jobFailureFatal);
+  CommandsRunner runner(commands, allocator, arg.outputDir, arg.jobFailureFatal, masterLogger);
   runner.run(implem.isMPI());
-  cerr << "end of run" << endl;
+  masterLogger.getCout() << "end of run" << endl;
   // End
   Time end = Common::getTime();
-  RunStatistics statistics(runner.getHistoric(), begin, end, implem.getRanksNumber() - 1);
+  RunStatistics statistics(runner.getHistoric(), begin, end, implem.getRanksNumber() - 1, masterLogger);
   statistics.printGeneralStatistics();
   if (runner.getHistoric().size()) {
     statistics.exportSVG(Common::getIncrementalLogFile(arg.outputDir, "statistics", "svg"));
   }
   allocator->terminate();
   implem.closeParallelContext();
-  cout << "End of Multiraxml run" << endl;
+  masterLogger.getCout() << "End of Multiraxml run" << endl;
   return 0;
 }
 
 } // namespace MPIScheduler
 
-int main(int argc, char** argv) 
+
+
+#ifdef MPISCHEDULER_BUILD_AS_LIBRARY
+
+extern "C" int mpi_scheduler_main(int argc, char** argv, void* comm)
 {
-  exit(MPIScheduler::main_scheduler(argc, argv));
+  int res =  MPIScheduler::main_scheduler(argc, argv, comm);
+  MPI_Barrier(*((MPI_Comm*)comm)); 
+  return res;
 }
 
+#else
+
+int main(int argc, char** argv) 
+{
+  exit(MPIScheduler::main_scheduler(argc, argv, 0));
+}
+
+
+#endif

@@ -123,7 +123,7 @@ bool OneCoreRanksAllocator::ranksAvailable()
  
 bool OneCoreRanksAllocator::allRanksAvailable()
 {
-  return _cores == _availableCores.size();
+  return (unsigned int)_cores == _availableCores.size();
 }
   
 void OneCoreRanksAllocator::terminate()
