@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Common.hpp"
 #include <string>
 #include <memory>
 #include <vector>
@@ -9,7 +10,6 @@
 
 #include <map>
 #include <stack>
-#include "Common.hpp"
 #include "Checkpoint.hpp"
 
 using namespace std;

@@ -1,5 +1,5 @@
-#include "Checkpoint.hpp"
 #include "Common.hpp"
+#include "Checkpoint.hpp"
 
 namespace MPIScheduler {
 

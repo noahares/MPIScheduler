@@ -1,4 +1,10 @@
+
 #pragma once
+
+#ifdef WITH_MPI
+#include <cstdio>
+#include <mpi.h>
+#endif
 
 #include <fstream>
 #include <chrono>
@@ -14,9 +20,6 @@
 #include <signal.h>  
 #include <iostream>
 
-#ifdef WITH_MPI
-#include <mpi.h>
-#endif
 using namespace std;
 
 namespace MPIScheduler {
