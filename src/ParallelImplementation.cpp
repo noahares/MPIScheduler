@@ -49,6 +49,7 @@ void ParallelImplementation::initParallelContext(int argc, char **argv, void *co
     _ownMPIContext = (comm == 0);
     if (_ownMPIContext) {
       Common::check(MPI_Init(&argc, &argv));
+      _comm = MPI_COMM_WORLD;
     } else {
       _comm = *((MPI_Comm*)comm);
     }
