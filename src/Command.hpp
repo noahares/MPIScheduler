@@ -19,7 +19,7 @@ public:
       unsigned int ranks,
       long estimatedCost,
       const std::vector<std::string> &arguments);
-  virtual ~Command() {}
+  virtual ~Command();
  
   const std::string &getId() const {return _id;}
   long getEstimatedCost() const {return _estimatedCost;}

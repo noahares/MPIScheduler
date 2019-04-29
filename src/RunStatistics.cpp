@@ -20,7 +20,7 @@ RunStatistics::RunStatistics(const InstancesHistoric &historic,
   _lbRatio(1.0),
   _masterLogger(masterLogger)
 {
-
+  assert(_availableRanks > 0);
 }
 
 void RunStatistics::printGeneralStatistics()

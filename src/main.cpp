@@ -69,6 +69,8 @@ static int main_scheduler(int argc, char **argv, void* comm)
 
 extern "C" int mpi_scheduler_main(int argc, char** argv, void* comm)
 {
+  assert(argv);
+  assert(argv);
   int res =  MPIScheduler::main_scheduler(argc, argv, comm);
   MPI_Barrier(*((MPI_Comm*)comm)); 
   return res;

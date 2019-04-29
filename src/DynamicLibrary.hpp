@@ -12,10 +12,10 @@ typedef int (*mainFct)(int,char**,void*);
 
 class DynamicLibrary {
 public:
-  DynamicLibrary();
+  DynamicLibrary() = default;
   ~DynamicLibrary();
   static std::shared_ptr<DynamicLibrary> getLibrary(const std::string &libraryPath);
-  int run(const std::string &logFile,
+  int run(const std::string &logsFile,
       const std::string &errFile,
       const std::vector<std::string> &args,
       void *comm); 

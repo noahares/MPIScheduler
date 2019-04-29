@@ -21,6 +21,7 @@ Instance::Instance(CommandPtr command,
   _endTime(Common::getTime()),
   _elapsed(0)
 {
+  assert(_ranksNumber > 0);
 }
 
 void Instance::writeSVGStatistics(SVGDrawer &drawer, const Time &)

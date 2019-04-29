@@ -6,12 +6,6 @@
 
 using namespace std;
 
-DynamicLibrary::DynamicLibrary():
-  _handle(nullptr),
-  _raxmlMain(nullptr)
-{
-
-}
   
 shared_ptr<DynamicLibrary> DynamicLibrary::getLibrary(const string &libraryPath)
 {
@@ -34,9 +28,9 @@ int DynamicLibrary::run(const string &logsFile,
   std::streambuf *cerrbuf = std::cerr.rdbuf(); 
   std::cerr.rdbuf(err.rdbuf());
   auto argc = args.size(); 
-  auto **argv = new char*[argc];
+  auto argv = new char*[argc];
   for (unsigned int i = 0; i < argc; ++i) {
-    argv[i] = (char*)args[i].c_str();
+    argv[i] = const_cast<char *>(args[i].c_str());
     cout << argv[i] << " ";
   }
   cout << endl;
@@ -59,6 +53,7 @@ bool DynamicLibrary::setPath(const string &libraryPath)
   if (libraryPath == "--static_scheduled_main") {
 #ifdef MPISCHEDULER_STATIC_SCHEDULED_MAIN
     _raxmlMain = (mainFct) static_scheduled_main;
+    assert(_raxmlMain);
     return true;
 #else
     cerr << "To use static_scheduled_main, please compile with MPISCHEDULER_STATIC_SCHEDULED_MAIN cmake variable on" << endl;
@@ -76,7 +71,7 @@ bool DynamicLibrary::setPath(const string &libraryPath)
   if (dlsym_error) {
     cerr << "Cannot load symbole dll_main " << dlsym_error << endl;
     dlclose(_handle);
-    _handle = 0;
+    _handle = nullptr;
     return false;
   }
   return true;

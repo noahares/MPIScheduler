@@ -94,6 +94,9 @@ void ParallelImplementation::startSlaves(int argc, char **argv) {
       OneCoreSlave slave;
       slave.main_core_slave(argc, argv);
     }
+#else
+    (void*)argc;
+    (void*)argv;
 #endif
   }
 }

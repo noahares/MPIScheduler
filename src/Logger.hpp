@@ -26,7 +26,7 @@ public:
       return *_os;
     }
     return std::cout;
-  };
+  }
 
 private:
   std::ofstream *_os;
