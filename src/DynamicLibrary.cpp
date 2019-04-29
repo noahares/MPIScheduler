@@ -2,11 +2,13 @@
 #include <dlfcn.h>
 #include <fstream>
 #include <iostream>
+#include <memory>
 
 using namespace std;
 
 DynamicLibrary::DynamicLibrary():
-  _handle(0)
+  _handle(nullptr),
+  _raxmlMain(nullptr)
 {
 
 }

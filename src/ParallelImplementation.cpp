@@ -16,7 +16,7 @@ using namespace std;
 
 namespace MPIScheduler {
 
-ParallelImplementation::ParallelImplementation(const string &implem): _rank(0), _ranksNumber(0) {
+ParallelImplementation::ParallelImplementation(const string &implem): _rank(0), _ranksNumber(0), _ownMPIContext(false) {
   if (implem == "--split-scheduler")
     _impl = split;
   else if (implem == "--onecore-scheduler") 

@@ -108,6 +108,7 @@ ForkInstance::ForkInstance(const string &outputDir,
       const string &threadsArg):
   Instance(command, coresOffset, cores, outputDir),
   _pid(0),
+  _returnValue(0),
   _execPath(execPath),
   _threadsArg(threadsArg)
 {

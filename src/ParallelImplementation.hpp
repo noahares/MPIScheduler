@@ -20,7 +20,7 @@ class ParallelImplementation {
     invalid
   };
 public:
-  ParallelImplementation(const std::string &implem);
+  explicit ParallelImplementation(const std::string &implem);
   bool isValid() const;
   int getRank() const;
   unsigned int getRanksNumber() const;

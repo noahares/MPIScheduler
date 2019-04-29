@@ -28,13 +28,6 @@ public:
     return std::cout;
   };
 
-  std::ostream &getCerr() {
-    if (_os) {
-      return *_os;
-    }
-    return std::cerr;
-  }
-
 private:
   std::ofstream *_os;
 };
