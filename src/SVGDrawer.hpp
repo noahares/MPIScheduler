@@ -24,7 +24,6 @@ private:
   double _height;
   double _ratioWidth;
   double _ratioHeight;
-  double _additionalHeight;
 };
 
 } // namespace MPIScheduler

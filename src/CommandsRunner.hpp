@@ -46,8 +46,6 @@ private:
   bool executePendingCommand();
   void onFinishedInstance(InstancePtr instance);
   
-  const CommandsContainer &_commandsContainer;
-  
   const std::string _outputDir;
 
   std::shared_ptr<RanksAllocator> _allocator;

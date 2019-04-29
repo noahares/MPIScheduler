@@ -23,7 +23,7 @@ Instance::Instance(CommandPtr command,
 {
 }
 
-void Instance::writeSVGStatistics(SVGDrawer &drawer, const Time &initialTime)
+void Instance::writeSVGStatistics(SVGDrawer &drawer, const Time &)
 {
   drawer.writeSquare(getStartingRank(),
     _startingElapsedMS,

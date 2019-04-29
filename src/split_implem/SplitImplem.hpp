@@ -78,8 +78,6 @@ private:
   int _ranksInUse;
   std::string _outputDir;
   std::map<int, InstancePtr> _rankToInstances;
-
-  MPI_Comm _availableComms;
 };
 
 class SplitInstance: public Instance {

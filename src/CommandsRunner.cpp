@@ -22,7 +22,7 @@ static inline void rtrim(std::string &s) {
 
 // Read a line in a commands file and skip comments
 // discards empty lines
-bool readNextLine(ifstream &is, string &os)
+static bool readNextLine(ifstream &is, string &os)
 {
   while (getline(is, os)) {
     auto end = os.find("#");
@@ -93,7 +93,6 @@ CommandsRunner::CommandsRunner(const CommandsContainer &commandsContainer,
       const string &outputDir,
       bool jobFailureFatal,
       Logger &masterLogger):
-  _commandsContainer(commandsContainer),
   _outputDir(outputDir),
   _allocator(allocator),
   _checkpoint(outputDir),

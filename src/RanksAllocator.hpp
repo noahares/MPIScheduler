@@ -15,7 +15,7 @@ public:
   virtual void freeRanks(InstancePtr instance) = 0;
   virtual std::vector<InstancePtr> checkFinishedInstances() = 0;
   virtual void terminate() {}
-  virtual void preprocessCommand(CommandPtr cmd) {}
+  virtual void preprocessCommand(CommandPtr) {}
 };
 
 }

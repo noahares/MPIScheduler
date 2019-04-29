@@ -14,7 +14,7 @@ using namespace std;
 namespace MPIScheduler {
 
   
-int main_scheduler(int argc, char **argv, void* comm)
+static int main_scheduler(int argc, char **argv, void* comm)
 {
   // Init
   SchedulerArgumentsParser arg(argc, argv);

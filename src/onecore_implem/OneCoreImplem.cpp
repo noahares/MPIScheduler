@@ -138,7 +138,7 @@ void OneCoreRanksAllocator::terminate()
   }
 }
   
-InstancePtr OneCoreRanksAllocator::allocateRanks(unsigned int requestedRanks, 
+InstancePtr OneCoreRanksAllocator::allocateRanks(unsigned int, 
       CommandPtr command)
 {
   int rank = _availableCores.front();

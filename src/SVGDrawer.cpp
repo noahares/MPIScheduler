@@ -13,8 +13,7 @@ SVGDrawer::SVGDrawer(const string &filepath,
   _width(500.0),
   _height(500.0),
   _ratioWidth(_width / maxXValue),
-  _ratioHeight(_height / maxYValue),
-  _additionalHeight(50.0)
+  _ratioHeight(_height / maxYValue)
 {
   if (!_os) {
     cerr << "Warning: cannot open  " << filepath << ". Skipping svg export." << endl;

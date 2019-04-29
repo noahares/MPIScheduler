@@ -22,30 +22,30 @@ const int TAG_MASTER_SIGNAL = 4;
 const int MSG_SIZE_END_JOB = 3;
 
 
-int getRank(MPI_Comm comm) {
+static int getRank(MPI_Comm comm) {
   int rank = 0;
   Common::check(MPI_Comm_rank(comm, &rank));
   return rank;
 }
-int getSize(MPI_Comm comm) {
+
+static int getSize(MPI_Comm comm) {
   int size = 0;
   Common::check(MPI_Comm_size(comm, &size));
   return size;
 }
 
 
-int mpiSend(void* data,
+static int mpiSend(void* data,
     int count,
     MPI_Datatype datatype,
     int destination,
     int tag,
     MPI_Comm communicator)
 {
-  //cout << "mpisend tag=" << tag << " dest=" << destination << " rank=" << getRank(MPI_COMM_WORLD) << endl << flush;
   return MPI_Send(data, count, datatype, destination, tag, communicator);
 }
 
-int mpiRecv(        void* data,
+static int mpiRecv(        void* data,
     int count,
     MPI_Datatype datatype,
     int source,
@@ -53,27 +53,22 @@ int mpiRecv(        void* data,
     MPI_Comm communicator,
     MPI_Status* status)
 {
-  int res =  MPI_Recv(data, count, datatype, source, tag, communicator, status);
-  //cout << "mpirecv tag=" << tag << " src=" << source << " rank=" << getRank(MPI_COMM_WORLD) << endl << flush;
-  return res;
+  return MPI_Recv(data, count, datatype, source, tag, communicator, status);
 }
 
-int mpiBcast( void *buffer, int count, MPI_Datatype datatype, int root, 
+static int mpiBcast( void *buffer, int count, MPI_Datatype datatype, int root, 
                    MPI_Comm comm)
 {
-  //cout << "begin bcast " << root << " " << getRank(MPI_COMM_WORLD) << endl << flush;
-  int res = MPI_Bcast(buffer, count, datatype, root, comm);
-  //cout << "end  bcast " << root << " " << getRank(MPI_COMM_WORLD) << endl << flush;
-  return res;
+  return MPI_Bcast(buffer, count, datatype, root, comm);
 }
 
-int mpiIprobe(int source, int tag, MPI_Comm comm, int *flag,
+static int mpiIprobe(int source, int tag, MPI_Comm comm, int *flag,
         MPI_Status *status)
 {
   return MPI_Iprobe(source, tag, comm, flag, status);
 }
 
-int mpiSplit(MPI_Comm comm, int color, int key, MPI_Comm *newcomm)
+static int mpiSplit(MPI_Comm comm, int color, int key, MPI_Comm *newcomm)
 {
   return MPI_Comm_split(comm, color, key, newcomm);
 }
@@ -82,7 +77,7 @@ SplitSlave::~SplitSlave()
 {
 }
 
-void move_file(const string &from, const string &to)
+static void move_file(const string &from, const string &to)
 {
   if (std::rename(from.c_str(), to.c_str()) != 0) {
     cout << "failed to move " << from << " to " << to << endl;
@@ -248,7 +243,7 @@ void SplitRanksAllocator::terminate()
   }
 }
 
-void split(const SplitRanksAllocator::Slot &parent,
+static void split(const SplitRanksAllocator::Slot &parent,
     SplitRanksAllocator::Slot &son1,
     SplitRanksAllocator::Slot &son2,
     int son1size)

@@ -35,7 +35,7 @@ bool ForkRanksAllocator::allRanksAvailable()
   return !_coresInUse;
 }
 
-void split(const ForkRanksAllocator::Slot &parent,
+static void split(const ForkRanksAllocator::Slot &parent,
     ForkRanksAllocator::Slot &son1,
     ForkRanksAllocator::Slot &son2,
     unsigned int son1size)
@@ -114,7 +114,7 @@ ForkInstance::ForkInstance(const string &outputDir,
 
 }
 
-bool ForkInstance::execute(InstancePtr self)
+bool ForkInstance::execute(InstancePtr)
 {
   _timer.reset();
   pid_t pid = fork();
