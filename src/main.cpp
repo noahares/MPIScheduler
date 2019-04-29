@@ -1,13 +1,15 @@
 
 #include <iostream>
 #include <string>
-
+#include <cassert>
 #include "RanksAllocator.hpp"
 #include "ParallelImplementation.hpp"
 #include "Command.hpp"
 #include "Common.hpp"
 #include "CommandsRunner.hpp"
 #include "RunStatistics.hpp"
+
+using namespace std;
 
 namespace MPIScheduler {
 
@@ -24,7 +26,7 @@ int main_scheduler(int argc, char **argv, void* comm)
   implem.initParallelContext(argc, argv, comm);
   if (implem.slavesToStart()) {
     implem.startSlaves(argc, argv);
-    if (implem.getRank() != implem.getRanksNumber() - 1) {
+    if (implem.getRank() != int(implem.getRanksNumber()) - 1) {
       implem.closeParallelContext();
       return 0;
     }
@@ -47,7 +49,8 @@ int main_scheduler(int argc, char **argv, void* comm)
   masterLogger.getCout() << "end of run" << endl;
   // End
   Time end = Common::getTime();
-  RunStatistics statistics(runner.getHistoric(), begin, end, implem.getRanksNumber() - 1, masterLogger);
+  assert(implem.getRanksNumber() > 0);
+  RunStatistics statistics(runner.getHistoric(), begin, end, (unsigned int)(implem.getRanksNumber() - 1), masterLogger);
   statistics.printGeneralStatistics();
   if (runner.getHistoric().size()) {
     statistics.exportSVG(Common::getIncrementalLogFile(arg.outputDir, "statistics", "svg"));

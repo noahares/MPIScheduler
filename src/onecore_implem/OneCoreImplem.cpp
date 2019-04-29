@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <cassert>
+
+using namespace std;
 
 namespace MPIScheduler {
   
@@ -56,9 +59,9 @@ void OneCoreSlave::treatJobSlave()
   char command[maxCommandSize];
   MPI_Recv(command, maxCommandSize, MPI_CHAR, _masterRank, TAG_START_JOB, MPI_COMM_WORLD, &status);
   Timer timer;
-  int startingTime = _globalTimer.getElapsedMs();
+  int startingTime = int(_globalTimer.getElapsedMs());
   int jobResult = doWork(_commands.getCommand(string(command)), _outputDir);
-  int elapsedMS = timer.getElapsedMs();
+  int elapsedMS = int(timer.getElapsedMs());
   int endJobMsg[MSG_SIZE_END_JOB];
   endJobMsg[0] = jobResult;
   endJobMsg[1] = startingTime;
@@ -98,20 +101,21 @@ bool OneCoreInstance::execute(InstancePtr self)
 {
   int signal = SIGNAL_JOB;
   MPI_Send(&signal, 1, MPI_INT, self->getStartingRank(), TAG_MASTER_SIGNAL, MPI_COMM_WORLD); 
-  MPI_Send((char *)self->getId().c_str(), self->getId().size() + 1, MPI_CHAR, self->getStartingRank(), TAG_START_JOB, MPI_COMM_WORLD);
+  MPI_Send((char *)self->getId().c_str(), int(self->getId().size() + 1), MPI_CHAR, self->getStartingRank(), TAG_START_JOB, MPI_COMM_WORLD);
   return true;
 }
 
 
-OneCoreRanksAllocator::OneCoreRanksAllocator(int availableRanks,
+OneCoreRanksAllocator::OneCoreRanksAllocator(unsigned int availableRanks,
     const string &outputDir):
   _cores(availableRanks - 1),
   _outputDir(outputDir)
 {
+  assert(availableRanks > 0);
   Common::makedir(Common::joinPaths(outputDir, "per_job_logs"));
   Common::makedir(Common::joinPaths(outputDir, "running_jobs"));
-  for (int i = 0; i < _cores; ++i) {
-    _availableCores.push(i);
+  for (unsigned int i = 0; i < _cores; ++i) {
+    _availableCores.push(int(i));
   }
 }
 
@@ -134,7 +138,7 @@ void OneCoreRanksAllocator::terminate()
   }
 }
   
-InstancePtr OneCoreRanksAllocator::allocateRanks(int requestedRanks, 
+InstancePtr OneCoreRanksAllocator::allocateRanks(unsigned int requestedRanks, 
       CommandPtr command)
 {
   int rank = _availableCores.front();

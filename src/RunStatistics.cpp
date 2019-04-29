@@ -4,12 +4,14 @@
 #include "SVGDrawer.hpp"
 #include "Logger.hpp"
 
+using namespace std;
+
 namespace MPIScheduler {
 
 RunStatistics::RunStatistics(const InstancesHistoric &historic,
     Time begin,
     Time end,
-    int availableRanks,
+    unsigned int availableRanks,
     Logger &masterLogger):
   _historic(historic),
   _begin(begin),
@@ -40,9 +42,9 @@ void RunStatistics::exportSVG(const string &svgfile)
 {
   Timer t;
   _masterLogger.getCout() << "Saving svg output in " << svgfile << endl;
-  int totalWidth = _availableRanks + 1;
+  auto totalWidth = _availableRanks + 1;
   _masterLogger.getCout() << "total width " << totalWidth << endl;
-  int totalHeight = Common::getElapsedMs(_begin, _end);
+  auto totalHeight = Common::getElapsedMs(_begin, _end);
   string caption = "t = " + to_string(totalHeight / 1000) + "s";
   caption += ", lb = " + to_string(_lbRatio);
   SVGDrawer svg(svgfile, double(totalWidth), double(totalHeight));

@@ -5,6 +5,8 @@
 #include <ftw.h>
 #include <unistd.h>
 
+using namespace std;
+
 namespace MPIScheduler {
 
 int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)

@@ -3,6 +3,8 @@
 #include <fstream>
 #include <iostream>
 
+using namespace std;
+
 DynamicLibrary::DynamicLibrary():
   _handle(0)
 {
@@ -29,16 +31,16 @@ int DynamicLibrary::run(const string &logsFile,
   std::ofstream err(errFile);
   std::streambuf *cerrbuf = std::cerr.rdbuf(); 
   std::cerr.rdbuf(err.rdbuf());
-  int argc = args.size(); 
-  char **argv = new char*[argc];
-  for (int i = 0; i < argc; ++i) {
+  auto argc = args.size(); 
+  auto **argv = new char*[argc];
+  for (unsigned int i = 0; i < argc; ++i) {
     argv[i] = (char*)args[i].c_str();
     cout << argv[i] << " ";
   }
   cout << endl;
   int res = -1;
   try {
-    res =_raxmlMain(argc, argv, (void*)&comm);
+    res =_raxmlMain((int)argc, argv, (void*)&comm);
   } catch (exception &e) {
     cerr << "Catched exception: " << e.what() << endl;
   }                    

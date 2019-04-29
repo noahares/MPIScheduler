@@ -5,10 +5,10 @@
 namespace MPIScheduler {
   
 
-Command::Command(const string &id, 
+Command::Command(const std::string &id, 
     unsigned int ranks,
     long estimatedCost,
-    const vector<string> &arguments):
+    const std::vector<std::string> &arguments):
   _id(id),
   _args(arguments),
   _ranksNumber(ranks),

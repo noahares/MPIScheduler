@@ -4,6 +4,9 @@
 #include <fstream>
 #include <stdio.h>
 #include "../DynamicLibrary.hpp"
+#include <cassert>
+
+using namespace std;
 
 namespace MPIScheduler {
 
@@ -148,14 +151,14 @@ void SplitSlave::treatJobSlave()
     Common::check(mpiBcast(command, maxCommandSize, MPI_CHAR, _localMasterRank, _localComm));
   }
   Timer timer;
-  int startingTime = _globalTimer.getElapsedMs();
-  int jobResult = doWork(_commands.getCommand(string(command)), _localComm, _outputDir);
-  int elapsedMS = timer.getElapsedMs();
+  auto startingTime = _globalTimer.getElapsedMs();
+  auto jobResult = doWork(_commands.getCommand(string(command)), _localComm, _outputDir);
+  auto elapsedMS = timer.getElapsedMs();
   if (_localMasterRank == _localRank) {
     int endJobMsg[MSG_SIZE_END_JOB];
     endJobMsg[0] = jobResult;
-    endJobMsg[1] = startingTime;
-    endJobMsg[2] = elapsedMS;
+    endJobMsg[1] = int(startingTime);
+    endJobMsg[2] = int(elapsedMS);
     Common::check(mpiSend(endJobMsg, MSG_SIZE_END_JOB, MPI_INT, _globalMasterRank, TAG_END_JOB, MPI_COMM_WORLD));
   }
 }
@@ -211,7 +214,7 @@ int SplitSlave::main_split_slave(int argc, char **argv)
 }
 
 
-SplitRanksAllocator::SplitRanksAllocator(int availableRanks,
+SplitRanksAllocator::SplitRanksAllocator(unsigned int availableRanks,
     const string &outputDir):
   _totalRanks(availableRanks),
   _ranksInUse(0),
@@ -254,12 +257,13 @@ void split(const SplitRanksAllocator::Slot &parent,
   int signal = SIGNAL_SPLIT;
   Common::check(mpiSend(&signal, 1, MPI_INT, parent.startingRank, TAG_MASTER_SIGNAL, MPI_COMM_WORLD));
   Common::check(mpiSend(&son1size, 1, MPI_INT, parent.startingRank, TAG_SPLIT, MPI_COMM_WORLD));
-  son1 = SplitRanksAllocator::Slot(parent.startingRank, son1size);
-  son2 = SplitRanksAllocator::Slot(parent.startingRank + son1size, parent.ranksNumber - son1size);
+  son1 = SplitRanksAllocator::Slot(parent.startingRank, (unsigned int)son1size);
+  assert(int(parent.ranksNumber) >= son1size);
+  son2 = SplitRanksAllocator::Slot(parent.startingRank + son1size, (unsigned int)(parent.ranksNumber - (unsigned int)son1size));
 }
 
 
-InstancePtr SplitRanksAllocator::allocateRanks(int requestedRanks, 
+InstancePtr SplitRanksAllocator::allocateRanks(unsigned int requestedRanks, 
   CommandPtr command)
 {
   Slot slot = _slots.front();
@@ -274,7 +278,7 @@ InstancePtr SplitRanksAllocator::allocateRanks(int requestedRanks,
   
   InstancePtr instance(new SplitInstance(_outputDir,
     slot.startingRank,
-    slot.ranksNumber,
+    int(slot.ranksNumber),
     command));
   _rankToInstances[instance->getStartingRank()] = instance;
   return instance;
@@ -285,7 +289,7 @@ void SplitRanksAllocator::freeRanks(InstancePtr instance)
   _ranksInUse -= instance->getRanksNumber();
   auto splitInstance = static_pointer_cast<SplitInstance>(instance);
   _slots.push(Slot(instance->getStartingRank(), 
-        instance->getRanksNumber()));
+        (unsigned int)instance->getRanksNumber()));
 }
 
 vector<InstancePtr> SplitRanksAllocator::checkFinishedInstances()
@@ -323,8 +327,8 @@ vector<InstancePtr> SplitRanksAllocator::checkFinishedInstances()
 
 void SplitRanksAllocator::preprocessCommand(CommandPtr cmd)
 {
-  int ranksNumber = cmd->getRanksNumber();
-  int newNumber = _totalRanks;
+  auto ranksNumber = cmd->getRanksNumber();
+  unsigned int newNumber = _totalRanks;
   while (newNumber > ranksNumber) {
     newNumber /= 2;
   }
@@ -347,7 +351,7 @@ bool SplitInstance::execute(InstancePtr self)
   }
   int signal = SIGNAL_JOB;
   Common::check(mpiSend(&signal, 1, MPI_INT, self->getStartingRank(), TAG_MASTER_SIGNAL, MPI_COMM_WORLD));
-  Common::check(mpiSend((char *)self->getId().c_str(), self->getId().size() + 1, MPI_CHAR, self->getStartingRank(), TAG_START_JOB, MPI_COMM_WORLD));
+  Common::check(mpiSend((char *)self->getId().c_str(), int(self->getId().size() + 1), MPI_CHAR, self->getStartingRank(), TAG_START_JOB, MPI_COMM_WORLD));
   return true;
 }
   

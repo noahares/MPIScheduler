@@ -10,6 +10,8 @@
 #include <string>
 #include <unistd.h>
 
+using namespace std;
+
 namespace MPIScheduler {
 
 static inline void rtrim(std::string &s) {
@@ -44,7 +46,7 @@ CommandsContainer::CommandsContainer(const string &commandsFilename,
   while (readNextLine(reader, line)) {
     
     string id;
-    int ranks;
+    unsigned int ranks;
     long estimatedCost;
     
     istringstream iss(line);

@@ -3,6 +3,8 @@
 #include "SVGDrawer.hpp"
 #include "Common.hpp"
 
+using namespace std;
+
 namespace MPIScheduler {
 
 bool Instance::_jobFailureFatal = false;

@@ -14,15 +14,15 @@ public:
   RunStatistics(const InstancesHistoric &historic, 
       Time begin, 
       Time end,
-      int availableRanks,
+      unsigned int availableRanks,
       Logger &masterLogger);
   void printGeneralStatistics();
-  void exportSVG(const string &svgfile);
+  void exportSVG(const std::string &svgfile);
 private:
   const InstancesHistoric &_historic;
   Time _begin;
   Time _end;
-  int _availableRanks;
+  unsigned int _availableRanks;
   double _lbRatio;
   Logger &_masterLogger;
 };
