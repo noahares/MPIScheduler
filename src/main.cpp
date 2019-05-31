@@ -50,7 +50,7 @@ static int main_scheduler(int argc, char **argv, void* comm)
   // End
   Time end = Common::getTime();
   assert(implem.getRanksNumber() > 0);
-  RunStatistics statistics(runner.getHistoric(), begin, end, (unsigned int)(implem.getRanksNumber() - 1), masterLogger);
+  RunStatistics statistics(runner.getHistoric(), begin, end, (unsigned int)(implem.getRanksNumber()), masterLogger);
   statistics.printGeneralStatistics();
   if (runner.getHistoric().size()) {
     statistics.exportSVG(Common::getIncrementalLogFile(arg.outputDir, "statistics", "svg"));
@@ -72,7 +72,9 @@ extern "C" int mpi_scheduler_main(int argc, char** argv, void* comm)
   assert(argv);
   assert(argv);
   int res =  MPIScheduler::main_scheduler(argc, argv, comm);
-  MPI_Barrier(*((MPI_Comm*)comm)); 
+  if (comm) {
+    MPI_Barrier(*((MPI_Comm*)comm)); 
+  }
   return res;
 }
 

@@ -64,7 +64,7 @@ void ParallelImplementation::initParallelContext(int argc, char **argv, void *co
 #endif
   } else {
     _rank = 0;
-    _ranksNumber = 40;
+    _ranksNumber = 4;
   }
 }
 
