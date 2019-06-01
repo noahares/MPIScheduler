@@ -11,6 +11,7 @@
 
 #include "Command.hpp"
 #include "Common.hpp"
+#include "SchedulerArgumentsParser.hpp"
 
 
 namespace MPIScheduler {

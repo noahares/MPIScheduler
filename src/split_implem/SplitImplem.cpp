@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
+#include "../SchedulerArgumentsParser.hpp"
 #include "../DynamicLibrary.hpp"
 
 namespace MPIScheduler {

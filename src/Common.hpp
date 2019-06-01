@@ -110,43 +110,5 @@ private:
   Time _start;
 };
 
-class SchedulerArgumentsParser {
-public:
-  SchedulerArgumentsParser(int argc, char** argv):
-    commandsFilename()
-  {
-    if (argc < 6) {
-      print_help();
-      throw MPISchedulerException("Error: invalid syntax");
-    }
-    int i = 1;
-    implem = string(argv[i++]);
-    library = string(argv[i++]);
-    commandsFilename = string(argv[i++]);
-    outputDir = string(argv[i++]);
-    jobFailureFatal = atoi(argv[i++]);
-    if (i < argc) {
-      threadsArg = string(argv[i++]);
-    }
-    if (i < argc) {
-      outputLogs = string(argv[i++]);
-    }
-  }
-  
-  void print_help() 
-  {
-    cout << "Syntax:" << endl;
-    cout << "mpi-scheduler implem library command_file output_dir job_failure_fatal" << endl;
-  }
-
-  string implem;
-  string library;
-  string commandsFilename;
-  string outputDir;
-  int jobFailureFatal;
-  string threadsArg;
-  string outputLogs;
-};
-
 } // namespace MPIScheduler
 

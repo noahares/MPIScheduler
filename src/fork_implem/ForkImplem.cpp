@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <iostream> 
+#include "../SchedulerArgumentsParser.hpp"
 namespace MPIScheduler {
 
 ForkRanksAllocator::ForkRanksAllocator(int availableRanks, 

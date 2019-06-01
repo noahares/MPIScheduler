@@ -8,6 +8,7 @@
 #include "Common.hpp"
 #include "CommandsRunner.hpp"
 #include "RunStatistics.hpp"
+#include "SchedulerArgumentsParser.hpp"
 
 namespace MPIScheduler {
 
