@@ -3,6 +3,8 @@
 #include "SVGDrawer.hpp"
 #include "Common.hpp"
 
+using namespace std;
+
 namespace MPIScheduler {
 
 bool Instance::_jobFailureFatal = false;
@@ -19,9 +21,10 @@ Instance::Instance(CommandPtr command,
   _endTime(Common::getTime()),
   _elapsed(0)
 {
+  assert(_ranksNumber > 0);
 }
 
-void Instance::writeSVGStatistics(SVGDrawer &drawer, const Time &initialTime)
+void Instance::writeSVGStatistics(SVGDrawer &drawer, const Time &)
 {
   drawer.writeSquare(getStartingRank(),
     _startingElapsedMS,

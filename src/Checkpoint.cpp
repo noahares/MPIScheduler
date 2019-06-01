@@ -1,6 +1,8 @@
 #include "Common.hpp"
 #include "Checkpoint.hpp"
 
+using namespace std;
+
 namespace MPIScheduler {
 
 Checkpoint::Checkpoint(const string &outputDir):

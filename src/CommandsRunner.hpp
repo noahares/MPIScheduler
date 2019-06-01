@@ -4,7 +4,8 @@
 #include "Instance.hpp"
 #include "RanksAllocator.hpp"
 #include "Logger.hpp"
-
+#include <string>
+#include <vector>
 
 namespace MPIScheduler {
 
@@ -14,24 +15,24 @@ class Logger;
 class CommandsContainer {
 public:
   CommandsContainer() {}
-  explicit CommandsContainer(const string &commandsFilename,
+  explicit CommandsContainer(const std::string &commandsFilename,
       bool addFakeExecutableName);
 
-  CommandPtr getCommand(string id) const;
-  vector<CommandPtr> &getCommands() {return _commands;}
-  const vector<CommandPtr> &getCommands() const {return _commands;}
+  CommandPtr getCommand(std::string id) const;
+  std::vector<CommandPtr> &getCommands() {return _commands;}
+  const std::vector<CommandPtr> &getCommands() const {return _commands;}
 private:
   void addCommand(CommandPtr command);
 
-  vector<CommandPtr> _commands;
-  map<string, CommandPtr> _dicoCommands;
+  std::vector<CommandPtr> _commands;
+  std::map<std::string, CommandPtr> _dicoCommands;
 };
 
 class CommandsRunner {
 public:
   CommandsRunner(const CommandsContainer &commandsContainer,
-      shared_ptr<RanksAllocator> allocator,
-      const string &outputDir,
+      std::shared_ptr<RanksAllocator> allocator,
+      const std::string &outputDir,
       bool jobFailureFatal,
       Logger &masterLogger);
   void run(bool isMPI);
@@ -45,13 +46,11 @@ private:
   bool executePendingCommand();
   void onFinishedInstance(InstancePtr instance);
   
-  const CommandsContainer &_commandsContainer;
-  
-  const string _outputDir;
+  const std::string _outputDir;
 
-  shared_ptr<RanksAllocator> _allocator;
-  vector<CommandPtr> _commandsVector;
-  vector<CommandPtr>::iterator _commandIterator;
+  std::shared_ptr<RanksAllocator> _allocator;
+  std::vector<CommandPtr> _commandsVector;
+  std::vector<CommandPtr>::iterator _commandIterator;
   Checkpoint _checkpoint;
   InstancesHistoric _historic;
   int _finishedInstancesNumber;

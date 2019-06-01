@@ -5,15 +5,9 @@
 #include <ftw.h>
 #include <unistd.h>
 
-namespace MPIScheduler {
+using namespace std;
 
-int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
-{
-  int rv = remove(fpath);
-  if (rv)
-    perror(fpath);
-  return rv;
-}
+namespace MPIScheduler {
 
 string Common::getIncrementalLogFile(const string &path, 
       const string &name,

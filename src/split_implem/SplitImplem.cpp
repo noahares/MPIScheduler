@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include "../SchedulerArgumentsParser.hpp"
 #include "../DynamicLibrary.hpp"
+#include <cassert>
+
+using namespace std;
 
 namespace MPIScheduler {
 
@@ -20,30 +23,30 @@ const int TAG_MASTER_SIGNAL = 4;
 const int MSG_SIZE_END_JOB = 3;
 
 
-int getRank(MPI_Comm comm) {
+static int getRank(MPI_Comm comm) {
   int rank = 0;
   Common::check(MPI_Comm_rank(comm, &rank));
   return rank;
 }
-int getSize(MPI_Comm comm) {
+
+static int getSize(MPI_Comm comm) {
   int size = 0;
   Common::check(MPI_Comm_size(comm, &size));
   return size;
 }
 
 
-int mpiSend(void* data,
+static int mpiSend(void* data,
     int count,
     MPI_Datatype datatype,
     int destination,
     int tag,
     MPI_Comm communicator)
 {
-  //cout << "mpisend tag=" << tag << " dest=" << destination << " rank=" << getRank(MPI_COMM_WORLD) << endl << flush;
   return MPI_Send(data, count, datatype, destination, tag, communicator);
 }
 
-int mpiRecv(        void* data,
+static int mpiRecv(        void* data,
     int count,
     MPI_Datatype datatype,
     int source,
@@ -51,27 +54,22 @@ int mpiRecv(        void* data,
     MPI_Comm communicator,
     MPI_Status* status)
 {
-  int res =  MPI_Recv(data, count, datatype, source, tag, communicator, status);
-  //cout << "mpirecv tag=" << tag << " src=" << source << " rank=" << getRank(MPI_COMM_WORLD) << endl << flush;
-  return res;
+  return MPI_Recv(data, count, datatype, source, tag, communicator, status);
 }
 
-int mpiBcast( void *buffer, int count, MPI_Datatype datatype, int root, 
+static int mpiBcast( void *buffer, int count, MPI_Datatype datatype, int root, 
                    MPI_Comm comm)
 {
-  //cout << "begin bcast " << root << " " << getRank(MPI_COMM_WORLD) << endl << flush;
-  int res = MPI_Bcast(buffer, count, datatype, root, comm);
-  //cout << "end  bcast " << root << " " << getRank(MPI_COMM_WORLD) << endl << flush;
-  return res;
+  return MPI_Bcast(buffer, count, datatype, root, comm);
 }
 
-int mpiIprobe(int source, int tag, MPI_Comm comm, int *flag,
+static int mpiIprobe(int source, int tag, MPI_Comm comm, int *flag,
         MPI_Status *status)
 {
   return MPI_Iprobe(source, tag, comm, flag, status);
 }
 
-int mpiSplit(MPI_Comm comm, int color, int key, MPI_Comm *newcomm)
+static int mpiSplit(MPI_Comm comm, int color, int key, MPI_Comm *newcomm)
 {
   return MPI_Comm_split(comm, color, key, newcomm);
 }
@@ -80,7 +78,7 @@ SplitSlave::~SplitSlave()
 {
 }
 
-void move_file(const string &from, const string &to)
+static void move_file(const string &from, const string &to)
 {
   if (std::rename(from.c_str(), to.c_str()) != 0) {
     cout << "failed to move " << from << " to " << to << endl;
@@ -149,14 +147,14 @@ void SplitSlave::treatJobSlave()
     Common::check(mpiBcast(command, maxCommandSize, MPI_CHAR, _localMasterRank, _localComm));
   }
   Timer timer;
-  int startingTime = _globalTimer.getElapsedMs();
-  int jobResult = doWork(_commands.getCommand(string(command)), _localComm, _outputDir);
-  int elapsedMS = timer.getElapsedMs();
+  auto startingTime = _globalTimer.getElapsedMs();
+  auto jobResult = doWork(_commands.getCommand(string(command)), _localComm, _outputDir);
+  auto elapsedMS = timer.getElapsedMs();
   if (_localMasterRank == _localRank) {
     int endJobMsg[MSG_SIZE_END_JOB];
     endJobMsg[0] = jobResult;
-    endJobMsg[1] = startingTime;
-    endJobMsg[2] = elapsedMS;
+    endJobMsg[1] = int(startingTime);
+    endJobMsg[2] = int(elapsedMS);
     Common::check(mpiSend(endJobMsg, MSG_SIZE_END_JOB, MPI_INT, _globalMasterRank, TAG_END_JOB, MPI_COMM_WORLD));
   }
 }
@@ -212,7 +210,7 @@ int SplitSlave::main_split_slave(int argc, char **argv)
 }
 
 
-SplitRanksAllocator::SplitRanksAllocator(int availableRanks,
+SplitRanksAllocator::SplitRanksAllocator(unsigned int availableRanks,
     const string &outputDir):
   _totalRanks(availableRanks),
   _ranksInUse(0),
@@ -246,7 +244,7 @@ void SplitRanksAllocator::terminate()
   }
 }
 
-void split(const SplitRanksAllocator::Slot &parent,
+static void split(const SplitRanksAllocator::Slot &parent,
     SplitRanksAllocator::Slot &son1,
     SplitRanksAllocator::Slot &son2,
     int son1size)
@@ -255,12 +253,13 @@ void split(const SplitRanksAllocator::Slot &parent,
   int signal = SIGNAL_SPLIT;
   Common::check(mpiSend(&signal, 1, MPI_INT, parent.startingRank, TAG_MASTER_SIGNAL, MPI_COMM_WORLD));
   Common::check(mpiSend(&son1size, 1, MPI_INT, parent.startingRank, TAG_SPLIT, MPI_COMM_WORLD));
-  son1 = SplitRanksAllocator::Slot(parent.startingRank, son1size);
-  son2 = SplitRanksAllocator::Slot(parent.startingRank + son1size, parent.ranksNumber - son1size);
+  son1 = SplitRanksAllocator::Slot(parent.startingRank, (unsigned int)son1size);
+  assert(int(parent.ranksNumber) >= son1size);
+  son2 = SplitRanksAllocator::Slot(parent.startingRank + son1size, (unsigned int)(parent.ranksNumber - (unsigned int)son1size));
 }
 
 
-InstancePtr SplitRanksAllocator::allocateRanks(int requestedRanks, 
+InstancePtr SplitRanksAllocator::allocateRanks(unsigned int requestedRanks, 
   CommandPtr command)
 {
   Slot slot = _slots.front();
@@ -275,7 +274,7 @@ InstancePtr SplitRanksAllocator::allocateRanks(int requestedRanks,
   
   InstancePtr instance(new SplitInstance(_outputDir,
     slot.startingRank,
-    slot.ranksNumber,
+    int(slot.ranksNumber),
     command));
   _rankToInstances[instance->getStartingRank()] = instance;
   return instance;
@@ -286,7 +285,7 @@ void SplitRanksAllocator::freeRanks(InstancePtr instance)
   _ranksInUse -= instance->getRanksNumber();
   auto splitInstance = static_pointer_cast<SplitInstance>(instance);
   _slots.push(Slot(instance->getStartingRank(), 
-        instance->getRanksNumber()));
+        (unsigned int)instance->getRanksNumber()));
 }
 
 vector<InstancePtr> SplitRanksAllocator::checkFinishedInstances()
@@ -324,8 +323,8 @@ vector<InstancePtr> SplitRanksAllocator::checkFinishedInstances()
 
 void SplitRanksAllocator::preprocessCommand(CommandPtr cmd)
 {
-  int ranksNumber = cmd->getRanksNumber();
-  int newNumber = _totalRanks;
+  auto ranksNumber = cmd->getRanksNumber();
+  unsigned int newNumber = _totalRanks;
   while (newNumber > ranksNumber) {
     newNumber /= 2;
   }
@@ -348,7 +347,7 @@ bool SplitInstance::execute(InstancePtr self)
   }
   int signal = SIGNAL_JOB;
   Common::check(mpiSend(&signal, 1, MPI_INT, self->getStartingRank(), TAG_MASTER_SIGNAL, MPI_COMM_WORLD));
-  Common::check(mpiSend((char *)self->getId().c_str(), self->getId().size() + 1, MPI_CHAR, self->getStartingRank(), TAG_START_JOB, MPI_COMM_WORLD));
+  Common::check(mpiSend((char *)self->getId().c_str(), int(self->getId().size() + 1), MPI_CHAR, self->getStartingRank(), TAG_START_JOB, MPI_COMM_WORLD));
   return true;
 }
   

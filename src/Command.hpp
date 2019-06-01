@@ -1,43 +1,39 @@
 #pragma once
 
 #include "Common.hpp"
+
 #include <string>
 #include <memory>
 #include <vector>
-
-
-
-
 #include <map>
 #include <stack>
-#include "Checkpoint.hpp"
 
-using namespace std;
+#include "Checkpoint.hpp"
 
 namespace MPIScheduler {
 
 
 class Command {
 public:
-  Command(const string &id, 
+  Command(const std::string &id, 
       unsigned int ranks,
       long estimatedCost,
-      const vector<string> &arguments);
-  virtual ~Command() {}
+      const std::vector<std::string> &arguments);
+  virtual ~Command();
  
-  const string &getId() const {return _id;}
+  const std::string &getId() const {return _id;}
   long getEstimatedCost() const {return _estimatedCost;}
-  void setRanksNumber(int ranks) {_ranksNumber = ranks;}
-  int getRanksNumber() const {return _ranksNumber;}
-  string toString() const;
-  const vector<string> &getArgs() const {return _args;}
+  void setRanksNumber(unsigned int ranks) {_ranksNumber = ranks;}
+  unsigned int getRanksNumber() const {return _ranksNumber;}
+  std::string toString() const;
+  const std::vector<std::string> &getArgs() const {return _args;}
 public:
   // initial information
-  const string _id;
-  const vector<string> _args;
-  int _ranksNumber;
+  const std::string _id;
+  const std::vector<std::string> _args;
+  unsigned int _ranksNumber;
   long _estimatedCost;
 };
-using CommandPtr = shared_ptr<Command>;
+using CommandPtr = std::shared_ptr<Command>;
 
 }

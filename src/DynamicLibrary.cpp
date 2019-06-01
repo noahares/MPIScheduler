@@ -2,12 +2,10 @@
 #include <dlfcn.h>
 #include <fstream>
 #include <iostream>
+#include <memory>
+#include <cassert>
+using namespace std;
 
-DynamicLibrary::DynamicLibrary():
-  _handle(0)
-{
-
-}
   
 shared_ptr<DynamicLibrary> DynamicLibrary::getLibrary(const string &libraryPath)
 {
@@ -29,16 +27,16 @@ int DynamicLibrary::run(const string &logsFile,
   std::ofstream err(errFile);
   std::streambuf *cerrbuf = std::cerr.rdbuf(); 
   std::cerr.rdbuf(err.rdbuf());
-  int argc = args.size(); 
-  char **argv = new char*[argc];
-  for (int i = 0; i < argc; ++i) {
-    argv[i] = (char*)args[i].c_str();
+  auto argc = args.size(); 
+  auto argv = new char*[argc];
+  for (unsigned int i = 0; i < argc; ++i) {
+    argv[i] = const_cast<char *>(args[i].c_str());
     cout << argv[i] << " ";
   }
   cout << endl;
   int res = -1;
   try {
-    res =_raxmlMain(argc, argv, (void*)&comm);
+    res =_raxmlMain((int)argc, argv, (void*)&comm);
   } catch (exception &e) {
     cerr << "Catched exception: " << e.what() << endl;
   }                    
@@ -55,6 +53,7 @@ bool DynamicLibrary::setPath(const string &libraryPath)
   if (libraryPath == "--static_scheduled_main") {
 #ifdef MPISCHEDULER_STATIC_SCHEDULED_MAIN
     _raxmlMain = (mainFct) static_scheduled_main;
+    assert(_raxmlMain);
     return true;
 #else
     cerr << "To use static_scheduled_main, please compile with MPISCHEDULER_STATIC_SCHEDULED_MAIN cmake variable on" << endl;
@@ -72,7 +71,7 @@ bool DynamicLibrary::setPath(const string &libraryPath)
   if (dlsym_error) {
     cerr << "Cannot load symbole dll_main " << dlsym_error << endl;
     dlclose(_handle);
-    _handle = 0;
+    _handle = nullptr;
     return false;
   }
   return true;

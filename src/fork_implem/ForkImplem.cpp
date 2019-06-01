@@ -6,9 +6,12 @@
 #include <sys/wait.h>
 #include <iostream> 
 #include "../SchedulerArgumentsParser.hpp"
+
+using namespace std;
+
 namespace MPIScheduler {
 
-ForkRanksAllocator::ForkRanksAllocator(int availableRanks, 
+ForkRanksAllocator::ForkRanksAllocator(unsigned int availableRanks, 
     const string &execPath,
     const string &outputDir,
     const string &threadsArg):
@@ -33,16 +36,17 @@ bool ForkRanksAllocator::allRanksAvailable()
   return !_coresInUse;
 }
 
-void split(const ForkRanksAllocator::Slot &parent,
+static void split(const ForkRanksAllocator::Slot &parent,
     ForkRanksAllocator::Slot &son1,
     ForkRanksAllocator::Slot &son2,
-    int son1size)
+    unsigned int son1size)
 {
   son1 = ForkRanksAllocator::Slot(parent.startingRank, son1size);
-  son2 = ForkRanksAllocator::Slot(parent.startingRank + son1size, parent.ranksNumber - son1size);
+  assert(parent.ranksNumber > son1size);
+  son2 = ForkRanksAllocator::Slot(parent.startingRank + int(son1size), parent.ranksNumber - son1size);
 }
   
-InstancePtr ForkRanksAllocator::allocateRanks(int requestedRanks, 
+InstancePtr ForkRanksAllocator::allocateRanks(unsigned int requestedRanks, 
       CommandPtr command)
 {
   Slot slot = _slots.front();
@@ -58,7 +62,7 @@ InstancePtr ForkRanksAllocator::allocateRanks(int requestedRanks,
   shared_ptr<ForkInstance> instance(new ForkInstance(_outputDir,
     _execPath,
     slot.startingRank,
-    slot.ranksNumber,
+    int(slot.ranksNumber),
     command,
     _threadsArg));
   _runningInstances.insert(instance);
@@ -70,7 +74,7 @@ void ForkRanksAllocator::freeRanks(InstancePtr instance)
 {
   _coresInUse -= instance->getRanksNumber();
   _slots.push(Slot(instance->getStartingRank(), 
-        instance->getRanksNumber()));
+        (unsigned int)instance->getRanksNumber()));
 }
 
 vector<InstancePtr> ForkRanksAllocator::checkFinishedInstances()
@@ -105,13 +109,14 @@ ForkInstance::ForkInstance(const string &outputDir,
       const string &threadsArg):
   Instance(command, coresOffset, cores, outputDir),
   _pid(0),
+  _returnValue(0),
   _execPath(execPath),
   _threadsArg(threadsArg)
 {
 
 }
 
-bool ForkInstance::execute(InstancePtr self)
+bool ForkInstance::execute(InstancePtr)
 {
   _timer.reset();
   pid_t pid = fork();
@@ -153,7 +158,7 @@ bool ForkInstance::checkFinished()
   assert(result != -1);
   if (result) {
     _returnValue = WEXITSTATUS(status);
-    setElapsedMs(_timer.getElapsedMs());
+    setElapsedMs((int)_timer.getElapsedMs());
   }
   return result != 0;
 

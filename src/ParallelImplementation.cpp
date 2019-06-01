@@ -13,10 +13,11 @@
 #include "Common.hpp"
 #include "SchedulerArgumentsParser.hpp"
 
+using namespace std;
 
 namespace MPIScheduler {
 
-ParallelImplementation::ParallelImplementation(const string &implem): _rank(0), _ranksNumber(0) {
+ParallelImplementation::ParallelImplementation(const string &implem): _rank(0), _ranksNumber(0), _ownMPIContext(false) {
   if (implem == "--split-scheduler")
     _impl = split;
   else if (implem == "--onecore-scheduler") 
@@ -38,7 +39,7 @@ bool ParallelImplementation::isValid() const {
 }
 
 int ParallelImplementation::getRank() const {return _rank;}
-int ParallelImplementation::getRanksNumber() const {return _ranksNumber;}
+unsigned int ParallelImplementation::getRanksNumber() const {return _ranksNumber;}
 
 bool ParallelImplementation::isMPI() const {
   return (_impl == split) || (_impl == onecore); 
@@ -56,7 +57,9 @@ void ParallelImplementation::initParallelContext(int argc, char **argv, void *co
     }
     
     MPI_Comm_rank(_comm, &_rank);
-    MPI_Comm_size(_comm, &_ranksNumber);
+    int temp;
+    MPI_Comm_size(_comm, &temp);
+    _ranksNumber = (unsigned int)temp;
     assert(ranks == _ranksNumber);
 #else
     assert(0);
@@ -84,7 +87,7 @@ bool ParallelImplementation::slavesToStart() const {
 }
 
 void ParallelImplementation::startSlaves(int argc, char **argv) {
-  if (getRank() != getRanksNumber() - 1) {
+  if (getRank() != int(getRanksNumber()) - 1) {
 #ifdef WITH_MPI
     if (_impl == split) {
       SplitSlave slave;
@@ -93,12 +96,15 @@ void ParallelImplementation::startSlaves(int argc, char **argv) {
       OneCoreSlave slave;
       slave.main_core_slave(argc, argv);
     }
+#else
+    (void*)argc;
+    (void*)argv;
 #endif
   }
 }
 
 shared_ptr<RanksAllocator> ParallelImplementation::getRanksAllocator(SchedulerArgumentsParser &arg,
-                                  int ranksNumber) {
+                                  unsigned int ranksNumber) {
 #ifdef WITH_MPI
   if (_impl == split) {
     return shared_ptr<RanksAllocator>(new SplitRanksAllocator(ranksNumber,

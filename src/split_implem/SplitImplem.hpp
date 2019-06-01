@@ -23,7 +23,7 @@ public:
   ~SplitSlave();
   int main_split_slave(int argc, char **argv);
 private:
-  int doWork(const CommandPtr command, MPI_Comm workersComm, const string &outputDir); 
+  int doWork(const CommandPtr command, MPI_Comm workersComm, const std::string &outputDir); 
   void splitSlave();
   void treatJobSlave();
   void terminateSlave();
@@ -33,9 +33,9 @@ private:
   int _localMasterRank;
   int _globalMasterRank;
   CommandsContainer _commands;
-  string _outputDir;
+  std::string _outputDir;
   Timer _globalTimer;
-  string _libraryPath;
+  std::string _libraryPath;
 };
 
 /*
@@ -46,15 +46,15 @@ private:
 class SplitRanksAllocator: public RanksAllocator {
 public:
   // available threads must be a power of 2
-  SplitRanksAllocator(int availableRanks, 
-      const string &outoutDir);
+  SplitRanksAllocator(unsigned int availableRanks, 
+      const std::string &outoutDir);
   virtual ~SplitRanksAllocator() {}
   virtual bool ranksAvailable();
   virtual bool allRanksAvailable();
-  virtual InstancePtr allocateRanks(int requestedRanks, 
+  virtual InstancePtr allocateRanks(unsigned int requestedRanks, 
       CommandPtr command);
   virtual void freeRanks(InstancePtr instance);
-  virtual vector<InstancePtr> checkFinishedInstances();
+  virtual std::vector<InstancePtr> checkFinishedInstances();
   virtual void terminate();
   virtual void preprocessCommand(CommandPtr cmd);
   
@@ -63,28 +63,26 @@ public:
       startingRank(0),
       ranksNumber(0)
     {}
-    Slot(int _startingRank, int _ranksNumber) : 
+    Slot(int _startingRank, unsigned int _ranksNumber) : 
       startingRank(_startingRank),
       ranksNumber(_ranksNumber)
     {}
 
     int startingRank; // relative to MPI_COMM_WORLD
-    int ranksNumber;
+    unsigned int ranksNumber;
   };
 
 private:
-  int _totalRanks;
-  queue<Slot> _slots;
+  unsigned int _totalRanks;
+  std::queue<Slot> _slots;
   int _ranksInUse;
-  string _outputDir;
-  map<int, InstancePtr> _rankToInstances;
-
-  MPI_Comm _availableComms;
+  std::string _outputDir;
+  std::map<int, InstancePtr> _rankToInstances;
 };
 
 class SplitInstance: public Instance {
 public:
-  SplitInstance(const string &outputDir, 
+  SplitInstance(const std::string &outputDir, 
       int startingRank, 
       int ranksNumber,
       CommandPtr command);

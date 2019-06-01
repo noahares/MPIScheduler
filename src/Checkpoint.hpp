@@ -4,23 +4,21 @@
 #include <fstream>
 #include <set>
 
-using namespace std;
-
 namespace MPIScheduler {
 
 class Checkpoint {
 public:
-  explicit Checkpoint(const string &outputDir); 
+  explicit Checkpoint(const std::string &outputDir); 
  
-  bool isDone(const string &id);
-  void markDone(const string &id);
+  bool isDone(const std::string &id);
+  void markDone(const std::string &id);
 
 private:
-  static string getCheckpointCommandsFile(const string &outputDir);
+  static std::string getCheckpointCommandsFile(const std::string &outputDir);
 
 private:
-  set<string> _ids; 
-  ofstream _os;
+  std::set<std::string> _ids; 
+  std::ofstream _os;
 };
 
 } // namespace MPIScheduler

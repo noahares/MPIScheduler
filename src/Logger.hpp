@@ -5,8 +5,6 @@
 
 namespace MPIScheduler {
 
-using namespace std;
-
 class Logger {
 public:
   Logger(): _os(0) {
@@ -17,28 +15,21 @@ public:
     delete _os;
   }
 
-  void redirectLogs(const string &file) {
-    getCout() << "Redirecting logs to " << file << endl;
+  void redirectLogs(const std::string &file) {
+    getCout() << "Redirecting logs to " << file << std::endl;
     delete _os;
-    _os = new ofstream(file);
+    _os = new std::ofstream(file);
   }
 
-  ostream &getCout() {
+  std::ostream &getCout() {
     if (_os) {
       return *_os;
     }
-    return cout;
-  };
-
-  ostream &getCerr() {
-    if (_os) {
-      return *_os;
-    }
-    return cerr;
+    return std::cout;
   }
 
 private:
-  ofstream *_os;
+  std::ofstream *_os;
 };
 
 

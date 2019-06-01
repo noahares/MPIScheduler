@@ -15,11 +15,11 @@ public:
   int main_core_slave(int argc, char **argv);
 
   int doWork(const CommandPtr command, 
-    const string &outputDir) ;
+    const std::string &outputDir) ;
 private:
   void treatJobSlave();
-  string _execPath;
-  string _outputDir;
+  std::string _execPath;
+  std::string _outputDir;
   int _masterRank;
   Timer _globalTimer;
   CommandsContainer _commands;
@@ -31,27 +31,27 @@ private:
 class OneCoreRanksAllocator: public RanksAllocator {
 public:
   // available threads must be a power of 2
-  OneCoreRanksAllocator(int availableRanks, 
-      const string &outoutDir);
+  OneCoreRanksAllocator(unsigned int availableRanks, 
+      const std::string &outoutDir);
   virtual ~OneCoreRanksAllocator() {}
   virtual bool ranksAvailable();
   virtual bool allRanksAvailable();
-  virtual InstancePtr allocateRanks(int requestedRanks, 
+  virtual InstancePtr allocateRanks(unsigned int requestedRanks, 
       CommandPtr command);
   virtual void freeRanks(InstancePtr instance);
-  virtual vector<InstancePtr> checkFinishedInstances();
+  virtual std::vector<InstancePtr> checkFinishedInstances();
   virtual void terminate();
 private:
-  int _cores;
-  queue<int> _availableCores;
-  string _outputDir;
-  map<int, InstancePtr> _rankToInstances;
+  unsigned int _cores;
+  std::queue<int> _availableCores;
+  std::string _outputDir;
+  std::map<int, InstancePtr> _rankToInstances;
 
 };
 
 class OneCoreInstance: public Instance {
 public:
-  OneCoreInstance(const string &outputDir, 
+  OneCoreInstance(const std::string &outputDir, 
       int rank, 
       CommandPtr command);
 

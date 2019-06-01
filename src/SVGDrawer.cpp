@@ -13,8 +13,7 @@ SVGDrawer::SVGDrawer(const string &filepath,
   _width(500.0),
   _height(500.0),
   _ratioWidth(_width / maxXValue),
-  _ratioHeight(_height / maxYValue),
-  _additionalHeight(50.0)
+  _ratioHeight(_height / maxYValue)
 {
   if (!_os) {
     cerr << "Warning: cannot open  " << filepath << ". Skipping svg export." << endl;
@@ -45,8 +44,9 @@ void SVGDrawer::writeSquare(double x, double y, double w, double h, const char *
 
 void SVGDrawer::writeSquareAbsolute(double x, double y, double w, double h, const char *color)
 {
-  if (!_os)
+  if (!_os) {
     return;
+  }
   string colorStr(color ? string(color) : getRandomHex());
   //_os << "  <svg x=\"" << x << "\" y=\"" << y << "\" ";
   //_os << "width=\"" << w  << "\" "  << "height=\""  << h << "\" >" << endl;
@@ -57,8 +57,9 @@ void SVGDrawer::writeSquareAbsolute(double x, double y, double w, double h, cons
   
 void SVGDrawer::writeCaption(const string &text)
 {
-  if (!_os)
+  if (!_os) {
     return;
+  }
   _os << "<svg x = \"50\" y=\"550\">" << endl;
   _os << "  <text fill=\"blue\" font-size=\"30\" transform=\"translate(0, 35)\">" << text << "</text>" << endl;
   _os << "</svg>" << endl;
@@ -68,8 +69,9 @@ void SVGDrawer::writeCaption(const string &text)
 
 void SVGDrawer::writeHeader(const string &caption)
 {
-  if (!_os)
+  if (!_os) {
     return;
+  }
 
   _os << "<svg  xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0\" y=\"0\" width=\"600\" height=\"600\">" << endl;
   _os << "<rect x=\"0%\" y=\"0%\" height=\"100%\" width=\"100%\" style=\"fill: #ffffff\"/>" << endl;
@@ -86,8 +88,9 @@ void SVGDrawer::writeHeader(const string &caption)
 
 void SVGDrawer::writeFooter()
 {
-  if (!_os)
+  if (!_os) {
     return;
+  }
   _os << "</svg>" << endl;
   _os << "</svg>" << endl;
 

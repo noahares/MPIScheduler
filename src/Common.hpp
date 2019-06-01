@@ -19,21 +19,21 @@
 #include <vector>
 #include <signal.h>  
 #include <iostream>
-
-using namespace std;
+#include <string>
+#include <cassert>
 
 namespace MPIScheduler {
 
-class MPISchedulerException: public exception {
+class MPISchedulerException: public std::exception {
 public:
-  explicit MPISchedulerException(const string &s): msg_(s) {}
-  MPISchedulerException(const string &s1, 
-      const string &s2): msg_(s1 + s2) {}
+  explicit MPISchedulerException(const std::string &s): msg_(s) {}
+  MPISchedulerException(const std::string &s1, 
+      const std::string &s2): msg_(s1 + s2) {}
 private:
-  string msg_;
+  std::string msg_;
 };
 
-using Time = chrono::time_point<chrono::system_clock>;
+using Time = std::chrono::time_point<std::chrono::system_clock>;
 
 
 class Common {
@@ -44,33 +44,33 @@ public:
     mkdir(name.c_str(), 0755);
   }
   
-  static string joinPaths(const std::string &path1, const std::string &path2) {
+  static std::string joinPaths(const std::string &path1, const std::string &path2) {
     return path1 + "/" + path2;
   }
 
-  static string joinPaths(const std::string &path1, 
+  static std::string joinPaths(const std::string &path1, 
       const std::string &path2,
       const std::string &path3) {
     return joinPaths(joinPaths(path1, path2), path3);
   }
 
   static Time getTime() {
-    return chrono::system_clock::now();
+    return std::chrono::system_clock::now();
   }
 
-  static string getIncrementalLogFile(const string &path, 
-      const string &name,
-      const string &extension);
+  static std::string getIncrementalLogFile(const std::string &path, 
+      const std::string &name,
+      const std::string &extension);
 
   static long getElapsedMs(Time begin, Time end) {
-    return chrono::duration_cast<chrono::milliseconds>
+    return std::chrono::duration_cast<std::chrono::milliseconds>
       (end-begin).count();
   }
 
 #ifdef WITH_MPI
   static void check(int mpiError) {
     if (mpiError != MPI_SUCCESS) {
-      cout << "MPI ERROR !!!!" << endl;
+      std::cout << "MPI ERROR !!!!" << std::endl;
       throw MPISchedulerException("MPI error !");
     }
   }
@@ -80,16 +80,16 @@ public:
     return getpid();
   }
   
-  static string getHost() {
+  static std::string getHost() {
     char hostname[HOST_NAME_MAX];
     gethostname(hostname, HOST_NAME_MAX);
-    return string(hostname);
+    return std::string(hostname);
   }
 
 
 };
 
-int systemCall(const string &command, const string &outputFile, bool threadSafe = false);
+int systemCall(const std::string &command, const std::string &outputFile, bool threadSafe = false);
 
 
 class Timer {
@@ -98,13 +98,13 @@ public:
     reset();
   }
 
-  int getElapsedMs() const {
+  long getElapsedMs() const {
     auto end = Common::getTime();
     return Common::getElapsedMs(_start, end);
   }
 
   void reset() {
-    _start = chrono::system_clock::now();
+    _start = std::chrono::system_clock::now();
   }
 private:
   Time _start;
