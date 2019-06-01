@@ -1,6 +1,8 @@
 
 #include <iostream>
 #include <string>
+#include <chrono>
+#include <ctime>  
 
 #include "RanksAllocator.hpp"
 #include "ParallelImplementation.hpp"
@@ -12,7 +14,18 @@
 
 namespace MPIScheduler {
 
-  
+void printStart(int argc, char **argv)
+{
+  auto start = std::chrono::system_clock::now();
+  auto start_time = std::chrono::system_clock::to_time_t(start);
+  std::cout << "Program started at " << std::ctime(&start_time) << std::endl;
+  std::cout << "MPIScheduler was called as follow:" << std::endl;
+  for (unsigned int a = 0; a < argc; ++a) {
+    std::cout << argv[a] << " ";
+  }
+  std::cout << std::endl;
+}
+
 int main_scheduler(int argc, char **argv, void* comm)
 {
   // Init
@@ -22,7 +35,10 @@ int main_scheduler(int argc, char **argv, void* comm)
     cerr << "Invalid scheduler implementation: " << arg.implem << endl;
     return 1;
   }
-  implem.initParallelContext(argc, argv, comm);
+  implem.initParallelContext(argc, argv, comm, arg.coresNumber);
+  if (!implem.getRank()) {
+    printStart(argc, argv);
+  }
   if (implem.slavesToStart()) {
     implem.startSlaves(argc, argv);
     if (implem.getRank() != implem.getRanksNumber() - 1) {

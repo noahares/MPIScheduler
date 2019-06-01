@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 
+
 namespace MPIScheduler {
 
 class SchedulerArgumentsParser {
@@ -8,16 +9,11 @@ public:
   SchedulerArgumentsParser(int argc, char** argv):
     commandsFilename()
   {
-    if (argc < 7) {
+    if (argc < 6) {
       std::cerr << "INVALID SYNTAX" << std::endl;
       print_help();
       exit(1);
     }
-    std::cout << "MPIScheduler was called as follow:" << std::endl;
-    for (unsigned int a = 0; a < argc; ++a) {
-      std::cout << argv[a] << " ";
-    }
-    std::cout << std::endl;
     int i = 1;
     implem = std::string(argv[i++]);
     coresNumber = atoi(argv[i++]);
@@ -26,11 +22,12 @@ public:
     outputDir = std::string(argv[i++]);
     jobFailureFatal = 0;
     for (;i < argc; ++i) {
-      if (argv[i] == "--jobs-failure-fatal") {
+      auto currentArg = std::string(argv[i]);
+      if (currentArg == std::string("--jobs-failure-fatal")) {
         jobFailureFatal = true;
-      } else if (argv[i] == "--threads-arg") {
+      } else if (currentArg == std::string("--threads-arg")) {
         threadsArg = std::string(argv[++i]);
-      } else if (argv[i] == "--logs") {
+      } else if (currentArg == std::string("--logs")) {
         outputLogs = std::string(argv[++i]);
       }
     }

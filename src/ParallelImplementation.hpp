@@ -27,7 +27,7 @@ public:
   int getRank() const;
   int getRanksNumber() const;
   bool isMPI() const;
-  void initParallelContext(int argc, char **argv, void *comm);
+  void initParallelContext(int argc, char **argv, void *comm, int ranks);
   void closeParallelContext();
   bool slavesToStart() const;
   void startSlaves(int argc, char **argv);

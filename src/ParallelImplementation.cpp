@@ -44,7 +44,7 @@ bool ParallelImplementation::isMPI() const {
   return (_impl == split) || (_impl == onecore); 
 }
 
-void ParallelImplementation::initParallelContext(int argc, char **argv, void *comm) {
+void ParallelImplementation::initParallelContext(int argc, char **argv, void *comm, int ranks) {
   if (isMPI()) {
 #ifdef WITH_MPI
     _ownMPIContext = (comm == 0);
@@ -57,12 +57,13 @@ void ParallelImplementation::initParallelContext(int argc, char **argv, void *co
     
     MPI_Comm_rank(_comm, &_rank);
     MPI_Comm_size(_comm, &_ranksNumber);
+    assert(ranks == _ranksNumber);
 #else
     assert(0);
 #endif
   } else {
     _rank = 0;
-    _ranksNumber = 40;
+    _ranksNumber = ranks;
   }
 }
 
