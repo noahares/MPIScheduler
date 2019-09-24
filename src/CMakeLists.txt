@@ -15,7 +15,8 @@ set(MPI_SCHEDULER_SOURCES main.cpp
   SVGDrawer.cpp
   fork_implem/ForkImplem.cpp
 )
-set (MPI_SCHEDULER_LIBRARIES dl gcc_s gcc)
+
+set (MPI_SCHEDULER_LIBRARIES dl)
 
 if (WITH_MPI)
   find_package(MPI REQUIRED)
