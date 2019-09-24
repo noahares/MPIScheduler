@@ -81,9 +81,13 @@ public:
   }
   
   static std::string getHost() {
+#ifdef HOST_NAME_MAX // not defined on OSX
     char hostname[HOST_NAME_MAX];
     gethostname(hostname, HOST_NAME_MAX);
     return std::string(hostname);
+#else
+    return std::string();
+#endif
   }
 
 
