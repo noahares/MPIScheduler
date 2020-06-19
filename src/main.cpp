@@ -22,7 +22,7 @@ void printStart(int argc, char **argv)
   auto start_time = std::chrono::system_clock::to_time_t(start);
   std::cout << "Program started at " << std::ctime(&start_time) << std::endl;
   std::cout << "MPIScheduler was called as follow:" << std::endl;
-  for (unsigned int a = 0; a < argc; ++a) {
+  for (int a = 0; a < argc; ++a) {
     std::cout << argv[a] << " ";
   }
   std::cout << std::endl;
@@ -90,9 +90,11 @@ extern "C" int mpi_scheduler_main(int argc, char** argv, void* comm)
   assert(argv);
   assert(argv);
   int res =  MPIScheduler::main_scheduler(argc, argv, comm);
-  if (comm) {
+#ifdef WITH_MPI
+  if (comm) { 
     MPI_Barrier(*((MPI_Comm*)comm)); 
   }
+#endif
   return res;
 }
 
