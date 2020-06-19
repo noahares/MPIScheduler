@@ -29,6 +29,7 @@ public:
   explicit MPISchedulerException(const std::string &s): msg_(s) {}
   MPISchedulerException(const std::string &s1, 
       const std::string &s2): msg_(s1 + s2) {}
+  const char* what() const noexcept {return msg_.c_str();}
 private:
   std::string msg_;
 };
