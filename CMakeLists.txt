@@ -38,3 +38,8 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/src)
 set(CMAKE_CXX_FLAGS "-Weverything ${CMAKE_CXX_FLAGS}")
 set(CMAKE_C_FLAGS "-Weverything ${CMAKE_C_FLAGS}")
 
+set(MPISCHEDULER_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/src/
+  CACHE INTERNAL "${PROJECT_NAME}: Include dirs")
+
+
+
