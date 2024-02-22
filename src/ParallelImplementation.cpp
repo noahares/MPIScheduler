@@ -59,8 +59,8 @@ void ParallelImplementation::initParallelContext(int argc, char **argv, void *co
     MPI_Comm_rank(_comm, &_rank);
     int temp;
     MPI_Comm_size(_comm, &temp);
-    _ranksNumber = (unsigned int)temp;
-    assert(ranks == _ranksNumber);
+    _ranksNumber = static_cast<unsigned int>(temp);
+    assert(static_cast<unsigned int>(ranks) == _ranksNumber);
 #else
     assert(0);
 #endif
